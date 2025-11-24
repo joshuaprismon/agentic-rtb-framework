@@ -85,6 +85,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let addr = format!("{}:{}", address, port).parse().unwrap();
     let agentic_rtb_framework_service = RtbExtensionPointServer::new(RtbExtensionPointService::default());
 
+    println!("Agentic RTB Framework gRPC Server Version: {}", VERSION);
     println!("Setting gRPC Server Max connections: {}", max_server_connection);
     println!("Starting gRPC Server at: {}:{}", address, port);
 
