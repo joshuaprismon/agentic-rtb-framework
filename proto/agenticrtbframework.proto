@@ -2,6 +2,8 @@ syntax = "proto2";
 
 package com.iabtechlab.bidstream.mutation.v1;
 
+option go_package = "github.com/iabtechlab/agentic-rtb-framework/pkg/pb/artf";
+
 // Import OpenRTB definitions
 import "com/iabtechlab/openrtb/v2.6/openrtb.proto";
 

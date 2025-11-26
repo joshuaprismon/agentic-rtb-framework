@@ -1,0 +1,75 @@
+{
+  "id": "sample-native-001",
+  "tmax": 100,
+  "bid_request": {
+    "id": "auction-native-123",
+    "imp": [
+      {
+        "id": "imp-1",
+        "native": {
+          "request": "{\"ver\":\"1.2\",\"assets\":[{\"id\":1,\"required\":1,\"title\":{\"len\":90}},{\"id\":2,\"required\":1,\"img\":{\"type\":3,\"w\":300,\"h\":250}},{\"id\":3,\"required\":0,\"data\":{\"type\":2,\"len\":90}}]}",
+          "ver": "1.2",
+          "api": [3, 5]
+        },
+        "bidfloor": 3.00,
+        "bidfloorcur": "USD"
+      }
+    ],
+    "app": {
+      "id": "app-123",
+      "name": "Example News App",
+      "bundle": "com.example.newsapp",
+      "domain": "example.com",
+      "storeurl": "https://apps.apple.com/app/example-news/id123456789",
+      "cat": ["IAB12"],
+      "ver": "5.2.1",
+      "publisher": {
+        "id": "pub-app-001",
+        "name": "Example Media Inc"
+      }
+    },
+    "user": {
+      "id": "user-mobile-456",
+      "yob": 2000,
+      "gender": "F",
+      "data": [
+        {
+          "id": "mobile-dmp",
+          "name": "Mobile Audience Platform",
+          "segment": [
+            {"id": "seg-gen-z", "name": "Gen Z"},
+            {"id": "seg-mobile-power-user", "name": "Mobile Power User"},
+            {"id": "seg-news-junkie", "name": "News Junkie"}
+          ]
+        }
+      ]
+    },
+    "device": {
+      "ua": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15",
+      "devicetype": 4,
+      "make": "Apple",
+      "model": "iPhone15,2",
+      "os": "iOS",
+      "osv": "17.0",
+      "w": 390,
+      "h": 844,
+      "pxratio": 3.0,
+      "js": 1,
+      "language": "en",
+      "connectiontype": 6,
+      "ifa": "8A2E0A2B-3C4D-5E6F-7A8B-9C0D1E2F3A4B",
+      "geo": {
+        "lat": 37.7749,
+        "lon": -122.4194,
+        "type": 1,
+        "country": "USA",
+        "region": "CA",
+        "city": "San Francisco",
+        "zip": "94102"
+      }
+    },
+    "regs": {
+      "coppa": 0
+    }
+  }
+}

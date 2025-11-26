@@ -1,0 +1,576 @@
+// Minimal OpenRTB v2.6 definitions required for ARTF
+// Full spec available at: https://github.com/InteractiveAdvertisingBureau/openrtb
+syntax = "proto2";
+
+package com.iabtechlab.openrtb.v2_6;
+
+option go_package = "github.com/iabtechlab/agentic-rtb-framework/pkg/pb/openrtb";
+
+// BidRequest - Top-level bid request object
+message BidRequest {
+  // Unique ID of the bid request
+  optional string id = 1;
+
+  // Array of Imp objects representing impressions offered
+  repeated Imp imp = 2;
+
+  // Details about the publisher's website
+  optional Site site = 3;
+
+  // Details about the publisher's app
+  optional App app = 4;
+
+  // Details about the user's device
+  optional Device device = 5;
+
+  // Details about the human user of the device
+  optional User user = 6;
+
+  // Indicator of test mode (0 = live, 1 = test)
+  optional int32 test = 7 [default = 0];
+
+  // Auction type (1 = First Price, 2 = Second Price Plus)
+  optional int32 at = 8 [default = 2];
+
+  // Maximum time in milliseconds to submit a bid
+  optional int32 tmax = 9;
+
+  // Allowed list of buyer seats
+  repeated string wseat = 10;
+
+  // Block list of buyer seats
+  repeated string bseat = 11;
+
+  // Flag to indicate if all impressions must be won to win any
+  optional int32 allimps = 12 [default = 0];
+
+  // Array of allowed currencies
+  repeated string cur = 13;
+
+  // Allowed list of languages using ISO-639-1-alpha-2
+  repeated string wlang = 14;
+
+  // Blocked advertiser categories using IAB content categories
+  repeated string bcat = 15;
+
+  // Block list of advertisers by domain
+  repeated string badv = 16;
+
+  // Block list of applications
+  repeated string bapp = 17;
+
+  // Source object
+  optional Source source = 18;
+
+  // Regulations object
+  optional Regs regs = 19;
+
+  // Placeholder for exchange-specific extensions
+  optional bytes ext = 20;
+
+  // Impression object
+  message Imp {
+    // Unique identifier for this impression
+    required string id = 1;
+
+    // Array of Metric objects
+    repeated Metric metric = 2;
+
+    // Banner object
+    optional Banner banner = 3;
+
+    // Video object
+    optional Video video = 4;
+
+    // Audio object
+    optional Audio audio = 5;
+
+    // Native object
+    optional Native native = 6;
+
+    // Private marketplace deals
+    optional Pmp pmp = 7;
+
+    // Name of ad mediation partner, SDK technology, or player
+    optional string displaymanager = 8;
+
+    // Version of ad mediation partner, SDK technology, or player
+    optional string displaymanagerver = 9;
+
+    // 1 = interstitial, 0 = not interstitial
+    optional int32 instl = 10 [default = 0];
+
+    // Identifier for specific ad placement
+    optional string tagid = 11;
+
+    // Minimum bid for this impression in CPM
+    optional double bidfloor = 12 [default = 0];
+
+    // Currency of bidfloor using ISO-4217 alpha codes
+    optional string bidfloorcur = 13 [default = "USD"];
+
+    // Indicates if impression requires secure HTTPS URL
+    optional int32 secure = 14;
+
+    // Array of exchange-specific names of supported iframe busters
+    repeated string iframebuster = 15;
+
+    // Advisory as to number of seconds that may elapse between auction and impression
+    optional int32 exp = 16;
+
+    // Placeholder for exchange-specific extensions
+    optional bytes ext = 17;
+
+    // Metric object for viewability, completion, etc.
+    message Metric {
+      // Type of metric being presented
+      required string type = 1;
+
+      // Number representing the value of the metric
+      required double value = 2;
+
+      // Source of the value using exchange curated string names
+      optional string vendor = 3;
+
+      // Placeholder for exchange-specific extensions
+      optional bytes ext = 4;
+    }
+  }
+}
+
+// BidResponse - Top-level bid response object
+message BidResponse {
+  // ID of the bid request to which this is a response
+  required string id = 1;
+
+  // Array of seatbid objects
+  repeated SeatBid seatbid = 2;
+
+  // Bidder generated response ID
+  optional string bidid = 3;
+
+  // Bid currency using ISO-4217 alpha codes
+  optional string cur = 4 [default = "USD"];
+
+  // Optional feature to allow a bidder to set data in the exchange's cookie
+  optional string customdata = 5;
+
+  // Reason for not bidding
+  optional int32 nbr = 6;
+
+  // Placeholder for exchange-specific extensions
+  optional bytes ext = 7;
+}
+
+// SeatBid object
+message SeatBid {
+  // Array of 1+ Bid objects
+  repeated Bid bid = 1;
+
+  // ID of the buyer seat
+  optional string seat = 2;
+
+  // 0 = impressions can be won individually; 1 = all-or-nothing
+  optional int32 group = 3 [default = 0];
+
+  // Placeholder for exchange-specific extensions
+  optional bytes ext = 4;
+}
+
+// Bid object
+message Bid {
+  // Bidder generated bid ID
+  required string id = 1;
+
+  // ID of the Imp object in the related bid request
+  required string impid = 2;
+
+  // Bid price expressed as CPM
+  required double price = 3;
+
+  // Win notice URL
+  optional string nurl = 4;
+
+  // Billing notice URL
+  optional string burl = 5;
+
+  // Loss notice URL
+  optional string lurl = 6;
+
+  // Optional means of conveying ad markup
+  optional string adm = 7;
+
+  // ID of a preloaded ad
+  optional string adid = 8;
+
+  // Advertiser domain for block list checking
+  repeated string adomain = 9;
+
+  // Bundle or package name of the app
+  optional string bundle = 10;
+
+  // URL of the page where the ad will be shown
+  optional string iurl = 11;
+
+  // Campaign ID
+  optional string cid = 12;
+
+  // Creative ID
+  optional string crid = 13;
+
+  // Tactic ID
+  optional string tactic = 14;
+
+  // IAB content categories of the creative
+  repeated string cat = 15;
+
+  // Set of attributes describing the creative
+  repeated int32 attr = 16;
+
+  // API required by the markup if applicable
+  optional int32 api = 17;
+
+  // Video response protocol
+  optional int32 protocol = 18;
+
+  // Creative media rating per IQG guidelines
+  optional int32 qagmediarating = 19;
+
+  // Language of the creative using ISO-639-1-alpha-2
+  optional string language = 20;
+
+  // Reference to the deal.id from the bid request
+  optional string dealid = 21;
+
+  // Width of the creative in device independent pixels
+  optional int32 w = 22;
+
+  // Height of the creative in device independent pixels
+  optional int32 h = 23;
+
+  // Relative width of the creative when expressing size as a ratio
+  optional int32 wratio = 24;
+
+  // Relative height of the creative when expressing size as a ratio
+  optional int32 hratio = 25;
+
+  // Advisory as to number of seconds the bidder is willing to wait
+  optional int32 exp = 26;
+
+  // Placeholder for exchange-specific extensions
+  optional bytes ext = 27;
+}
+
+// Site object
+message Site {
+  optional string id = 1;
+  optional string name = 2;
+  optional string domain = 3;
+  repeated string cat = 4;
+  repeated string sectioncat = 5;
+  repeated string pagecat = 6;
+  optional string page = 7;
+  optional string ref = 8;
+  optional string search = 9;
+  optional int32 mobile = 10;
+  optional int32 privacypolicy = 11;
+  optional Publisher publisher = 12;
+  optional Content content = 13;
+  optional string keywords = 14;
+  optional bytes ext = 15;
+}
+
+// App object
+message App {
+  optional string id = 1;
+  optional string name = 2;
+  optional string bundle = 3;
+  optional string domain = 4;
+  optional string storeurl = 5;
+  repeated string cat = 6;
+  repeated string sectioncat = 7;
+  repeated string pagecat = 8;
+  optional string ver = 9;
+  optional int32 privacypolicy = 10;
+  optional int32 paid = 11;
+  optional Publisher publisher = 12;
+  optional Content content = 13;
+  optional string keywords = 14;
+  optional bytes ext = 15;
+}
+
+// Publisher object
+message Publisher {
+  optional string id = 1;
+  optional string name = 2;
+  repeated string cat = 3;
+  optional string domain = 4;
+  optional bytes ext = 5;
+}
+
+// Content object
+message Content {
+  optional string id = 1;
+  optional int32 episode = 2;
+  optional string title = 3;
+  optional string series = 4;
+  optional string season = 5;
+  optional string artist = 6;
+  optional string genre = 7;
+  optional string album = 8;
+  optional string isrc = 9;
+  optional Producer producer = 10;
+  optional string url = 11;
+  repeated string cat = 12;
+  optional int32 prodq = 13;
+  optional int32 context = 14;
+  optional string contentrating = 15;
+  optional string userrating = 16;
+  optional int32 qagmediarating = 17;
+  optional string keywords = 18;
+  optional int32 livestream = 19;
+  optional int32 sourcerelationship = 20;
+  optional int32 len = 21;
+  optional string language = 22;
+  optional int32 embeddable = 23;
+  repeated Data data = 24;
+  optional bytes ext = 25;
+}
+
+// Producer object
+message Producer {
+  optional string id = 1;
+  optional string name = 2;
+  repeated string cat = 3;
+  optional string domain = 4;
+  optional bytes ext = 5;
+}
+
+// Device object
+message Device {
+  optional string ua = 1;
+  optional Geo geo = 2;
+  optional int32 dnt = 3;
+  optional int32 lmt = 4;
+  optional string ip = 5;
+  optional string ipv6 = 6;
+  optional int32 devicetype = 7;
+  optional string make = 8;
+  optional string model = 9;
+  optional string os = 10;
+  optional string osv = 11;
+  optional string hwv = 12;
+  optional int32 h = 13;
+  optional int32 w = 14;
+  optional int32 ppi = 15;
+  optional double pxratio = 16;
+  optional int32 js = 17;
+  optional int32 geofetch = 18;
+  optional string flashver = 19;
+  optional string language = 20;
+  optional string carrier = 21;
+  optional string mccmnc = 22;
+  optional int32 connectiontype = 23;
+  optional string ifa = 24;
+  optional string didsha1 = 25;
+  optional string didmd5 = 26;
+  optional string dpidsha1 = 27;
+  optional string dpidmd5 = 28;
+  optional string macsha1 = 29;
+  optional string macmd5 = 30;
+  optional bytes ext = 31;
+}
+
+// Geo object
+message Geo {
+  optional double lat = 1;
+  optional double lon = 2;
+  optional int32 type = 3;
+  optional int32 accuracy = 4;
+  optional int32 lastfix = 5;
+  optional int32 ipservice = 6;
+  optional string country = 7;
+  optional string region = 8;
+  optional string regionfips104 = 9;
+  optional string metro = 10;
+  optional string city = 11;
+  optional string zip = 12;
+  optional int32 utcoffset = 13;
+  optional bytes ext = 14;
+}
+
+// User object
+message User {
+  optional string id = 1;
+  optional string buyeruid = 2;
+  optional int32 yob = 3;
+  optional string gender = 4;
+  optional string keywords = 5;
+  optional string customdata = 6;
+  optional Geo geo = 7;
+  repeated Data data = 8;
+  optional bytes ext = 9;
+}
+
+// Data object
+message Data {
+  optional string id = 1;
+  optional string name = 2;
+  repeated Segment segment = 3;
+  optional bytes ext = 4;
+}
+
+// Segment object
+message Segment {
+  optional string id = 1;
+  optional string name = 2;
+  optional string value = 3;
+  optional bytes ext = 4;
+}
+
+// Regs object
+message Regs {
+  optional int32 coppa = 1;
+  optional int32 gdpr = 2;
+  optional string us_privacy = 3;
+  optional bytes ext = 4;
+}
+
+// Source object
+message Source {
+  optional int32 fd = 1;
+  optional string tid = 2;
+  optional string pchain = 3;
+  optional SupplyChain schain = 4;
+  optional bytes ext = 5;
+}
+
+// SupplyChain object
+message SupplyChain {
+  optional int32 complete = 1;
+  repeated SupplyChainNode nodes = 2;
+  optional string ver = 3;
+  optional bytes ext = 4;
+}
+
+// SupplyChainNode object
+message SupplyChainNode {
+  optional string asi = 1;
+  optional string sid = 2;
+  optional string rid = 3;
+  optional string name = 4;
+  optional string domain = 5;
+  optional int32 hp = 6;
+  optional bytes ext = 7;
+}
+
+// Pmp object (Private Marketplace)
+message Pmp {
+  optional int32 private_auction = 1 [default = 0];
+  repeated Deal deals = 2;
+  optional bytes ext = 3;
+}
+
+// Deal object
+message Deal {
+  required string id = 1;
+  optional double bidfloor = 2 [default = 0];
+  optional string bidfloorcur = 3 [default = "USD"];
+  optional int32 at = 4;
+  repeated string wseat = 5;
+  repeated string wadomain = 6;
+  optional bytes ext = 7;
+}
+
+// Banner object
+message Banner {
+  repeated Format format = 1;
+  optional int32 w = 2;
+  optional int32 h = 3;
+  optional int32 wmax = 4;
+  optional int32 hmax = 5;
+  optional int32 wmin = 6;
+  optional int32 hmin = 7;
+  repeated int32 btype = 8;
+  repeated int32 battr = 9;
+  optional int32 pos = 10;
+  repeated string mimes = 11;
+  optional int32 topframe = 12;
+  repeated int32 expdir = 13;
+  repeated int32 api = 14;
+  optional string id = 15;
+  optional int32 vcm = 16;
+  optional bytes ext = 17;
+}
+
+// Format object
+message Format {
+  optional int32 w = 1;
+  optional int32 h = 2;
+  optional int32 wratio = 3;
+  optional int32 hratio = 4;
+  optional int32 wmin = 5;
+  optional bytes ext = 6;
+}
+
+// Video object
+message Video {
+  repeated string mimes = 1;
+  optional int32 minduration = 2;
+  optional int32 maxduration = 3;
+  repeated int32 protocols = 4;
+  optional int32 w = 5;
+  optional int32 h = 6;
+  optional int32 startdelay = 7;
+  optional int32 placement = 8;
+  optional int32 linearity = 9;
+  optional int32 skip = 10;
+  optional int32 skipmin = 11;
+  optional int32 skipafter = 12;
+  optional int32 sequence = 13;
+  repeated int32 battr = 14;
+  optional int32 maxextended = 15;
+  optional int32 minbitrate = 16;
+  optional int32 maxbitrate = 17;
+  optional int32 boxingallowed = 18;
+  repeated int32 playbackmethod = 19;
+  optional int32 playbackend = 20;
+  repeated int32 delivery = 21;
+  optional int32 pos = 22;
+  repeated Banner companionad = 23;
+  repeated int32 api = 24;
+  repeated int32 companiontype = 25;
+  optional bytes ext = 26;
+}
+
+// Audio object
+message Audio {
+  repeated string mimes = 1;
+  optional int32 minduration = 2;
+  optional int32 maxduration = 3;
+  repeated int32 protocols = 4;
+  optional int32 startdelay = 5;
+  optional int32 sequence = 6;
+  repeated int32 battr = 7;
+  optional int32 maxextended = 8;
+  optional int32 minbitrate = 9;
+  optional int32 maxbitrate = 10;
+  repeated int32 delivery = 11;
+  repeated Banner companionad = 12;
+  repeated int32 api = 13;
+  repeated int32 companiontype = 14;
+  optional int32 maxseq = 15;
+  optional int32 feed = 16;
+  optional int32 stitched = 17;
+  optional int32 nvol = 18;
+  optional bytes ext = 19;
+}
+
+// Native object
+message Native {
+  required string request = 1;
+  optional string ver = 2;
+  repeated int32 api = 3;
+  repeated int32 battr = 4;
+  optional bytes ext = 5;
+}

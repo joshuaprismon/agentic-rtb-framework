@@ -1,0 +1,50 @@
+{
+  "id": "sample-banner-001",
+  "tmax": 100,
+  "bid_request": {
+    "id": "auction-123",
+    "imp": [
+      {
+        "id": "imp-1",
+        "banner": {
+          "w": 300,
+          "h": 250,
+          "pos": 1
+        },
+        "bidfloor": 1.50,
+        "bidfloorcur": "USD"
+      }
+    ],
+    "site": {
+      "id": "site-456",
+      "domain": "example.com",
+      "cat": ["IAB1"],
+      "page": "https://example.com/article"
+    },
+    "user": {
+      "id": "user-789",
+      "yob": 1990,
+      "gender": "M",
+      "data": [
+        {
+          "id": "data-provider-1",
+          "name": "Example DMP",
+          "segment": [
+            {
+              "id": "seg-sports",
+              "name": "Sports Enthusiast"
+            }
+          ]
+        }
+      ]
+    },
+    "device": {
+      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+      "ip": "192.168.1.1",
+      "geo": {
+        "country": "USA",
+        "region": "CA"
+      }
+    }
+  }
+}
