@@ -552,6 +552,213 @@
             opacity: 0.6;
         }
 
+        /* Documentation Section */
+        .docs-section {
+            margin-bottom: 24px;
+        }
+
+        .docs-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            padding: 16px 20px;
+            background: var(--iab-white);
+            border: 1px solid var(--iab-light-gray);
+            border-left: 4px solid var(--iab-red);
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--iab-dark-gray);
+            transition: background 0.2s;
+        }
+
+        .docs-toggle:hover {
+            background: var(--iab-bg-gray);
+        }
+
+        .docs-toggle-icon {
+            font-size: 20px;
+            transition: transform 0.2s;
+        }
+
+        .docs-toggle.active .docs-toggle-icon {
+            transform: rotate(180deg);
+        }
+
+        .docs-content {
+            display: none;
+            background: var(--iab-white);
+            border: 1px solid var(--iab-light-gray);
+            border-top: none;
+            border-radius: 0 0 4px 4px;
+            padding: 24px;
+        }
+
+        .docs-content.show {
+            display: block;
+        }
+
+        .docs-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        @media (max-width: 900px) {
+            .docs-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .docs-card {
+            background: var(--iab-bg-gray);
+            border-radius: 4px;
+            padding: 20px;
+        }
+
+        .docs-card h3 {
+            color: var(--iab-charcoal);
+            font-size: 18px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .docs-card h3::before {
+            content: '';
+            width: 4px;
+            height: 18px;
+            background: var(--iab-red);
+            border-radius: 2px;
+        }
+
+        .docs-card p {
+            color: var(--iab-gray);
+            margin-bottom: 16px;
+            line-height: 1.6;
+        }
+
+        .intent-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .intent-list li {
+            padding: 12px;
+            background: var(--iab-white);
+            border-radius: 4px;
+            margin-bottom: 8px;
+            border-left: 3px solid var(--iab-red);
+        }
+
+        .intent-list li:last-child {
+            margin-bottom: 0;
+        }
+
+        .intent-name {
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 13px;
+            color: var(--iab-red);
+            font-weight: 600;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .intent-desc {
+            font-size: 13px;
+            color: var(--iab-gray);
+        }
+
+        .flow-diagram {
+            background: var(--iab-charcoal);
+            border-radius: 4px;
+            padding: 20px;
+            margin-top: 16px;
+        }
+
+        .flow-step {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 16px;
+            color: var(--iab-white);
+        }
+
+        .flow-step:last-child {
+            margin-bottom: 0;
+        }
+
+        .flow-number {
+            width: 28px;
+            height: 28px;
+            background: var(--iab-red);
+            color: var(--iab-white);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 13px;
+            flex-shrink: 0;
+            margin-right: 12px;
+        }
+
+        .flow-content {
+            flex: 1;
+        }
+
+        .flow-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .flow-desc {
+            font-size: 13px;
+            color: #aaa;
+        }
+
+        .flow-arrow {
+            text-align: center;
+            color: var(--iab-gray);
+            margin: 8px 0;
+            margin-left: 8px;
+        }
+
+        .lifecycle-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 16px;
+            font-size: 13px;
+        }
+
+        .lifecycle-table th,
+        .lifecycle-table td {
+            padding: 10px 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--iab-light-gray);
+        }
+
+        .lifecycle-table th {
+            background: var(--iab-charcoal);
+            color: var(--iab-white);
+            font-weight: 600;
+        }
+
+        .lifecycle-table tr:nth-child(even) {
+            background: var(--iab-bg-gray);
+        }
+
+        .lifecycle-table code {
+            background: var(--iab-charcoal);
+            color: #e8e8e8;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 12px;
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .header-nav {
@@ -624,6 +831,175 @@
                 <div class="connection-status">
                     <span class="status-dot" id="status-dot"></span>
                     <span id="connection-status">Connecting...</span>
+                </div>
+            </div>
+
+            <!-- Documentation Section -->
+            <div class="docs-section">
+                <button class="docs-toggle" onclick="toggleDocs()" id="docs-toggle">
+                    <span>ARTF Intents &amp; Processing Flow</span>
+                    <span class="docs-toggle-icon">&#9660;</span>
+                </button>
+                <div class="docs-content" id="docs-content">
+                    <div class="docs-grid">
+                        <!-- Intents Column -->
+                        <div class="docs-card">
+                            <h3>Supported Intents</h3>
+                            <p>
+                                ARTF agents propose mutations to OpenRTB bid requests and responses through a set of defined intents.
+                                Each intent represents a specific type of modification that can be applied during the auction lifecycle.
+                            </p>
+                            <ul class="intent-list">
+                                <li>
+                                    <span class="intent-name">ACTIVATE_SEGMENTS</span>
+                                    <span class="intent-desc">Activate user segments by external segment IDs for audience targeting and data enrichment</span>
+                                </li>
+                                <li>
+                                    <span class="intent-name">ACTIVATE_DEALS</span>
+                                    <span class="intent-desc">Activate private marketplace deals by external deal IDs to enable preferred buying</span>
+                                </li>
+                                <li>
+                                    <span class="intent-name">SUPPRESS_DEALS</span>
+                                    <span class="intent-desc">Suppress specific deals from participating in the auction based on business rules</span>
+                                </li>
+                                <li>
+                                    <span class="intent-name">ADJUST_DEAL_FLOOR</span>
+                                    <span class="intent-desc">Dynamically adjust the bid floor price for a specific deal</span>
+                                </li>
+                                <li>
+                                    <span class="intent-name">ADJUST_DEAL_MARGIN</span>
+                                    <span class="intent-desc">Modify the margin or fee structure associated with a deal</span>
+                                </li>
+                                <li>
+                                    <span class="intent-name">BID_SHADE</span>
+                                    <span class="intent-desc">Optimize bid prices using intelligent pricing strategies to maximize value</span>
+                                </li>
+                                <li>
+                                    <span class="intent-name">ADD_METRICS</span>
+                                    <span class="intent-desc">Add viewability, brand safety, or other measurement metrics to impressions</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- Flow Column -->
+                        <div class="docs-card">
+                            <h3>Processing Flow</h3>
+                            <p>
+                                The ARTF framework operates at different stages of the auction lifecycle. Agents receive bid request data,
+                                analyze it, and return proposed mutations that the host platform can apply.
+                            </p>
+                            <div class="flow-diagram">
+                                <div class="flow-step">
+                                    <div class="flow-number">1</div>
+                                    <div class="flow-content">
+                                        <div class="flow-title">Bid Request Received</div>
+                                        <div class="flow-desc">Host platform receives OpenRTB bid request from exchange</div>
+                                    </div>
+                                </div>
+                                <div class="flow-step">
+                                    <div class="flow-number">2</div>
+                                    <div class="flow-content">
+                                        <div class="flow-title">Agent Invocation</div>
+                                        <div class="flow-desc">Platform invokes ARTF agent via gRPC or MCP with request data</div>
+                                    </div>
+                                </div>
+                                <div class="flow-step">
+                                    <div class="flow-number">3</div>
+                                    <div class="flow-content">
+                                        <div class="flow-title">Analysis &amp; Decision</div>
+                                        <div class="flow-desc">Agent analyzes user, impression, and context data to determine mutations</div>
+                                    </div>
+                                </div>
+                                <div class="flow-step">
+                                    <div class="flow-number">4</div>
+                                    <div class="flow-content">
+                                        <div class="flow-title">Mutation Response</div>
+                                        <div class="flow-desc">Agent returns list of proposed mutations with intent, operation, and path</div>
+                                    </div>
+                                </div>
+                                <div class="flow-step">
+                                    <div class="flow-number">5</div>
+                                    <div class="flow-content">
+                                        <div class="flow-title">Platform Application</div>
+                                        <div class="flow-desc">Host platform validates and applies approved mutations to the bidstream</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Lifecycle Stages -->
+                    <div class="docs-card" style="margin-top: 24px;">
+                        <h3>Auction Lifecycle Stages</h3>
+                        <p>
+                            ARTF agents can be invoked at different points in the auction lifecycle. The <code>lifecycle</code>
+                            parameter indicates when the agent is being called, allowing for stage-appropriate mutations.
+                        </p>
+                        <table class="lifecycle-table">
+                            <thead>
+                                <tr>
+                                    <th>Stage</th>
+                                    <th>Description</th>
+                                    <th>Available Data</th>
+                                    <th>Common Intents</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>PRE_AUCTION</code></td>
+                                    <td>Before bids are solicited</td>
+                                    <td>Bid Request only</td>
+                                    <td>ACTIVATE_SEGMENTS, ACTIVATE_DEALS, SUPPRESS_DEALS</td>
+                                </tr>
+                                <tr>
+                                    <td><code>POST_BID</code></td>
+                                    <td>After bids are received</td>
+                                    <td>Bid Request + Bid Response</td>
+                                    <td>BID_SHADE, ADJUST_DEAL_FLOOR, ADD_METRICS</td>
+                                </tr>
+                                <tr>
+                                    <td><code>PRE_RENDER</code></td>
+                                    <td>Before ad rendering</td>
+                                    <td>Winning bid details</td>
+                                    <td>ADD_METRICS</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Operations -->
+                    <div class="docs-card" style="margin-top: 24px;">
+                        <h3>Mutation Operations</h3>
+                        <p>
+                            Each mutation specifies an operation type that determines how the value should be applied to the target path.
+                        </p>
+                        <table class="lifecycle-table">
+                            <thead>
+                                <tr>
+                                    <th>Operation</th>
+                                    <th>Description</th>
+                                    <th>Example Use Case</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>OPERATION_ADD</code></td>
+                                    <td>Add new data to the target path</td>
+                                    <td>Adding new segments to user.data</td>
+                                </tr>
+                                <tr>
+                                    <td><code>OPERATION_REMOVE</code></td>
+                                    <td>Remove existing data from the target path</td>
+                                    <td>Suppressing a deal from the PMP</td>
+                                </tr>
+                                <tr>
+                                    <td><code>OPERATION_REPLACE</code></td>
+                                    <td>Replace existing data at the target path</td>
+                                    <td>Adjusting a bid price or floor</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
@@ -718,6 +1094,14 @@
     <script>
         const MCP_ENDPOINT = '{{.MCPEndpoint}}';
         let sessionId = null;
+
+        // Toggle documentation section
+        function toggleDocs() {
+            const toggle = document.getElementById('docs-toggle');
+            const content = document.getElementById('docs-content');
+            toggle.classList.toggle('active');
+            content.classList.toggle('show');
+        }
 
         // Initialize MCP session
         async function initSession() {
