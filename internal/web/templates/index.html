@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARTF - Agentic RTB Framework Tester | IAB Tech Lab</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* IAB Tech Lab Brand Colors */
+            --iab-red: #dd3333;
+            --iab-red-dark: #c42d2d;
+            --iab-red-light: #ff4444;
+            --iab-black: #000000;
+            --iab-charcoal: #252525;
+            --iab-dark-gray: #3f3f3f;
+            --iab-gray: #666666;
+            --iab-light-gray: #eeeeee;
+            --iab-bg-gray: #f4f4f4;
+            --iab-white: #ffffff;
+
+            /* Functional Colors */
+            --success: #28a745;
+            --error: #dc3545;
+            --warning: #ffc107;
+            --info: #17a2b8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-size: 14px;
+            color: var(--iab-dark-gray);
+            background: var(--iab-bg-gray);
+            line-height: 1.6;
+        }
+
+        /* Header */
+        .header {
+            background: var(--iab-black);
+            color: var(--iab-white);
+            padding: 0;
+        }
+
+        .header-top {
+            background: var(--iab-charcoal);
+            padding: 8px 0;
+            font-size: 12px;
+        }
+
+        .header-top .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-top a {
+            color: var(--iab-white);
+            text-decoration: none;
+            opacity: 0.8;
+        }
+
+        .header-top a:hover {
+            opacity: 1;
+            color: var(--iab-red);
+        }
+
+        .header-main {
+            padding: 20px 0;
+        }
+
+        .header-main .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            text-decoration: none;
+            color: var(--iab-white);
+        }
+
+        .logo-icon {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .logo-icon .dot {
+            width: 12px;
+            height: 12px;
+            background: var(--iab-red);
+            border-radius: 50%;
+        }
+
+        .logo-icon .dot.large {
+            width: 20px;
+            height: 20px;
+        }
+
+        .logo-text {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-text span {
+            color: var(--iab-red);
+        }
+
+        .logo-subtitle {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.7;
+            margin-top: 2px;
+        }
+
+        .header-nav {
+            display: flex;
+            gap: 24px;
+            align-items: center;
+        }
+
+        .header-nav a {
+            color: var(--iab-white);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+
+        .header-nav a:hover {
+            color: var(--iab-red);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Page Title Section */
+        .page-title {
+            background: linear-gradient(135deg, var(--iab-charcoal) 0%, var(--iab-black) 100%);
+            color: var(--iab-white);
+            padding: 40px 0;
+            border-bottom: 4px solid var(--iab-red);
+        }
+
+        .page-title h1 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .page-title p {
+            font-size: 16px;
+            opacity: 0.8;
+        }
+
+        .page-title .badge {
+            display: inline-block;
+            background: var(--iab-red);
+            color: var(--iab-white);
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 32px 0;
+        }
+
+        /* Info Bar */
+        .info-bar {
+            background: var(--iab-white);
+            border: 1px solid var(--iab-light-gray);
+            border-left: 4px solid var(--iab-red);
+            border-radius: 0 4px 4px 0;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .info-bar code {
+            background: var(--iab-charcoal);
+            color: var(--iab-white);
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 13px;
+        }
+
+        .connection-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--iab-gray);
+        }
+
+        .status-dot.connected {
+            background: var(--success);
+        }
+
+        .status-dot.disconnected {
+            background: var(--error);
+        }
+
+        /* Grid Layout */
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        @media (max-width: 1024px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Card Styles */
+        .card {
+            background: var(--iab-white);
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+
+        .card-header {
+            background: var(--iab-charcoal);
+            color: var(--iab-white);
+            padding: 16px 20px;
+            font-weight: 600;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-header::before {
+            content: '';
+            width: 4px;
+            height: 20px;
+            background: var(--iab-red);
+            border-radius: 2px;
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--iab-dark-gray);
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid var(--iab-light-gray);
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--iab-red);
+            box-shadow: 0 0 0 3px rgba(221, 51, 51, 0.1);
+        }
+
+        /* Sample Buttons */
+        .samples-label {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--iab-dark-gray);
+        }
+
+        .samples-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .sample-btn {
+            padding: 8px 16px;
+            background: var(--iab-bg-gray);
+            border: 1px solid var(--iab-light-gray);
+            border-radius: 4px;
+            font-size: 13px;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--iab-dark-gray);
+        }
+
+        .sample-btn:hover {
+            border-color: var(--iab-red);
+            background: var(--iab-white);
+        }
+
+        .sample-btn.active {
+            background: var(--iab-red);
+            border-color: var(--iab-red);
+            color: var(--iab-white);
+        }
+
+        /* Code Editor */
+        textarea {
+            width: 100%;
+            min-height: 280px;
+            padding: 16px;
+            border: 1px solid var(--iab-light-gray);
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+            resize: vertical;
+            background: var(--iab-charcoal);
+            color: #e8e8e8;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--iab-red);
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--iab-red);
+            color: var(--iab-white);
+        }
+
+        .btn-primary:hover {
+            background: var(--iab-red-dark);
+        }
+
+        .btn-primary:disabled {
+            background: var(--iab-gray);
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: var(--iab-light-gray);
+            color: var(--iab-dark-gray);
+        }
+
+        .btn-secondary:hover {
+            background: #ddd;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        /* Spinner */
+        .spinner {
+            width: 18px;
+            height: 18px;
+            border: 2px solid transparent;
+            border-top-color: currentColor;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Status Messages */
+        .status {
+            padding: 12px 16px;
+            border-radius: 4px;
+            font-size: 14px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status.pending {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+        }
+
+        /* Response Container */
+        .response-container {
+            background: var(--iab-charcoal);
+            border-radius: 4px;
+            padding: 16px;
+            min-height: 280px;
+            max-height: 450px;
+            overflow: auto;
+        }
+
+        .response-container pre {
+            color: #e8e8e8;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 13px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            margin: 0;
+        }
+
+        .mutation {
+            background: #3a3a3a;
+            border-radius: 4px;
+            padding: 14px;
+            margin-bottom: 12px;
+            border-left: 3px solid var(--iab-red);
+        }
+
+        .mutation-header {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+
+        .mutation-intent {
+            color: var(--success);
+            font-weight: 600;
+        }
+
+        .mutation-op {
+            color: #ffc107;
+        }
+
+        .mutation-path {
+            color: #60a5fa;
+            font-family: monospace;
+        }
+
+        .mutation pre {
+            margin-top: 8px;
+            font-size: 12px;
+            color: #aaa;
+        }
+
+        .response-meta {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #444;
+            color: #888;
+            font-size: 12px;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--iab-black);
+            color: var(--iab-white);
+            padding: 32px 0;
+            margin-top: 40px;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 24px;
+        }
+
+        .footer-links a {
+            color: var(--iab-white);
+            text-decoration: none;
+            font-size: 13px;
+            opacity: 0.8;
+            transition: opacity 0.2s;
+        }
+
+        .footer-links a:hover {
+            opacity: 1;
+            color: var(--iab-red);
+        }
+
+        .footer-copyright {
+            font-size: 12px;
+            opacity: 0.6;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-nav {
+                display: none;
+            }
+
+            .page-title h1 {
+                font-size: 24px;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .footer-content {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-top">
+            <div class="container">
+                <span>Agentic RTB Framework v1.0</span>
+                <a href="https://iabtechlab.com/standards/artf/" target="_blank">View Specification</a>
+            </div>
+        </div>
+        <div class="header-main">
+            <div class="container">
+                <a href="/" class="logo">
+                    <div class="logo-icon">
+                        <span class="dot large"></span>
+                        <span class="dot"></span>
+                        <span class="dot"></span>
+                    </div>
+                    <div>
+                        <div class="logo-text">iab<span>.TECH LAB</span></div>
+                        <div class="logo-subtitle">Agentic RTB Framework</div>
+                    </div>
+                </a>
+                <nav class="header-nav">
+                    <a href="/api/samples">API</a>
+                    <a href="https://github.com/InteractiveAdvertisingBureau" target="_blank">GitHub</a>
+                    <a href="https://iabtechlab.com/" target="_blank">IAB Tech Lab</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Page Title -->
+    <section class="page-title">
+        <div class="container">
+            <span class="badge">MCP Tool Tester</span>
+            <h1>Extend RTB Tool</h1>
+            <p>Test the Model Context Protocol interface for OpenRTB bidstream mutations</p>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Info Bar -->
+            <div class="info-bar">
+                <div>
+                    <strong>MCP Endpoint:</strong> <code>{{.MCPEndpoint}}</code>
+                </div>
+                <div class="connection-status">
+                    <span class="status-dot" id="status-dot"></span>
+                    <span id="connection-status">Connecting...</span>
+                </div>
+            </div>
+
+            <!-- Grid -->
+            <div class="grid">
+                <!-- Request Builder -->
+                <div class="card">
+                    <div class="card-header">Request Builder</div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label class="samples-label">Sample Payloads</label>
+                            <div class="samples-list" id="samples-list">
+                                {{range $id, $sample := .Samples}}
+                                <button class="sample-btn" data-sample="{{$id}}" title="{{$sample.Description}}">
+                                    {{$sample.Name}}
+                                </button>
+                                {{end}}
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="request-id">Request ID</label>
+                            <input type="text" id="request-id" value="test-001" placeholder="Unique request ID">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="tmax">Timeout (ms)</label>
+                            <input type="number" id="tmax" value="100" min="1" max="1000">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="payload">OpenRTB Payload (JSON)</label>
+                            <textarea id="payload" placeholder="Enter or select a sample payload...">{
+  "id": "auction-123",
+  "imp": [
+    {
+      "id": "imp-1",
+      "banner": {"w": 300, "h": 250},
+      "bidfloor": 1.50
+    }
+  ],
+  "user": {
+    "id": "user-789",
+    "yob": 1990,
+    "gender": "M"
+  }
+}</textarea>
+                        </div>
+
+                        <div class="button-group">
+                            <button class="btn btn-primary" id="send-btn" onclick="sendRequest()">
+                                <span id="send-text">Send Request</span>
+                                <span id="send-spinner" class="spinner" style="display: none;"></span>
+                            </button>
+                            <button class="btn btn-secondary" onclick="clearPayload()">Clear</button>
+                            <button class="btn btn-secondary" onclick="formatPayload()">Format JSON</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Response -->
+                <div class="card">
+                    <div class="card-header">Response</div>
+                    <div class="card-body">
+                        <div id="status-container"></div>
+                        <div class="response-container">
+                            <pre id="response-output">Response will appear here after sending a request...</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-links">
+                    <a href="/api/samples">API Samples</a>
+                    <a href="https://iabtechlab.com/standards/artf/" target="_blank">ARTF Specification</a>
+                    <a href="https://iabtechlab.com/standards/openrtb/" target="_blank">OpenRTB</a>
+                    <a href="https://modelcontextprotocol.io/" target="_blank">MCP Protocol</a>
+                </div>
+                <div class="footer-copyright">
+                    &copy; 2025 IAB Technology Laboratory. Licensed under Creative Commons Attribution 3.0.
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const MCP_ENDPOINT = '{{.MCPEndpoint}}';
+        let sessionId = null;
+
+        // Initialize MCP session
+        async function initSession() {
+            const statusEl = document.getElementById('connection-status');
+            const statusDot = document.getElementById('status-dot');
+
+            statusEl.textContent = 'Connecting...';
+            statusDot.className = 'status-dot';
+
+            try {
+                const response = await fetch(MCP_ENDPOINT, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        jsonrpc: '2.0',
+                        id: 1,
+                        method: 'initialize',
+                        params: {
+                            protocolVersion: '2024-11-05',
+                            capabilities: {},
+                            clientInfo: { name: 'artf-web-tester', version: '1.0' }
+                        }
+                    })
+                });
+
+                sessionId = response.headers.get('Mcp-Session-Id');
+
+                if (response.ok) {
+                    statusEl.textContent = 'Connected';
+                    statusDot.className = 'status-dot connected';
+                } else {
+                    throw new Error('Failed to initialize');
+                }
+            } catch (error) {
+                statusEl.textContent = 'Disconnected';
+                statusDot.className = 'status-dot disconnected';
+                console.error('Session init error:', error);
+            }
+        }
+
+        // Send request to MCP
+        async function sendRequest() {
+            const sendBtn = document.getElementById('send-btn');
+            const sendText = document.getElementById('send-text');
+            const sendSpinner = document.getElementById('send-spinner');
+            const statusContainer = document.getElementById('status-container');
+            const responseOutput = document.getElementById('response-output');
+
+            const requestId = document.getElementById('request-id').value || 'test-001';
+            const tmax = parseInt(document.getElementById('tmax').value) || 100;
+            const payloadText = document.getElementById('payload').value;
+
+            let bidRequest, bidResponse;
+            try {
+                const payload = JSON.parse(payloadText);
+                bidRequest = payload.bid_request || payload;
+                bidResponse = payload.bid_response || null;
+            } catch (e) {
+                statusContainer.innerHTML = '<div class="status error">Invalid JSON: ' + e.message + '</div>';
+                return;
+            }
+
+            sendBtn.disabled = true;
+            sendText.style.display = 'none';
+            sendSpinner.style.display = 'block';
+            statusContainer.innerHTML = '<div class="status pending">Processing request...</div>';
+
+            try {
+                const startTime = performance.now();
+
+                const toolRequest = {
+                    jsonrpc: '2.0',
+                    id: Date.now(),
+                    method: 'tools/call',
+                    params: {
+                        name: 'extend_rtb',
+                        arguments: {
+                            id: requestId,
+                            tmax: tmax,
+                            bid_request: bidRequest,
+                            ...(bidResponse && { bid_response: bidResponse })
+                        }
+                    }
+                };
+
+                const headers = { 'Content-Type': 'application/json' };
+                if (sessionId) {
+                    headers['Mcp-Session-Id'] = sessionId;
+                }
+
+                const response = await fetch(MCP_ENDPOINT, {
+                    method: 'POST',
+                    headers: headers,
+                    body: JSON.stringify(toolRequest)
+                });
+
+                const elapsed = (performance.now() - startTime).toFixed(2);
+                const result = await response.json();
+
+                if (result.error) {
+                    statusContainer.innerHTML = `<div class="status error">Error: ${result.error.message}</div>`;
+                    responseOutput.textContent = JSON.stringify(result, null, 2);
+                } else if (result.result && result.result.content) {
+                    statusContainer.innerHTML = `<div class="status success">Success &mdash; ${elapsed}ms</div>`;
+
+                    const content = result.result.content[0];
+                    if (content.type === 'text') {
+                        const rtbResponse = JSON.parse(content.text);
+                        responseOutput.innerHTML = formatResponse(rtbResponse);
+                    } else {
+                        responseOutput.textContent = JSON.stringify(result.result, null, 2);
+                    }
+                } else {
+                    responseOutput.textContent = JSON.stringify(result, null, 2);
+                }
+            } catch (error) {
+                statusContainer.innerHTML = `<div class="status error">Request failed: ${error.message}</div>`;
+                responseOutput.textContent = error.toString();
+            } finally {
+                sendBtn.disabled = false;
+                sendText.style.display = 'inline';
+                sendSpinner.style.display = 'none';
+            }
+        }
+
+        function formatResponse(response) {
+            let html = `<div style="margin-bottom: 16px; color: #ccc;">
+                <strong style="color: #fff;">Request ID:</strong> ${response.id}<br>
+                <strong style="color: #fff;">Mutations:</strong> ${response.mutations?.length || 0}
+            </div>`;
+
+            if (response.mutations && response.mutations.length > 0) {
+                response.mutations.forEach((mutation, i) => {
+                    html += `<div class="mutation">
+                        <div class="mutation-header">
+                            <span class="mutation-intent">${mutation.intent}</span>
+                            <span class="mutation-op">${mutation.op}</span>
+                        </div>
+                        <div class="mutation-path">Path: ${mutation.path}</div>
+                        <pre>${JSON.stringify(mutation.value, null, 2)}</pre>
+                    </div>`;
+                });
+            } else {
+                html += '<div style="color: #888; padding: 20px; text-align: center;">No mutations returned</div>';
+            }
+
+            if (response.metadata) {
+                html += `<div class="response-meta">
+                    <strong>API Version:</strong> ${response.metadata.api_version} &nbsp;|&nbsp;
+                    <strong>Model:</strong> ${response.metadata.model_version}
+                </div>`;
+            }
+
+            return html;
+        }
+
+        async function loadSample(sampleId) {
+            try {
+                const response = await fetch(`/api/samples/${sampleId}`);
+                const payload = await response.json();
+                document.getElementById('payload').value = JSON.stringify(payload, null, 2);
+
+                document.querySelectorAll('.sample-btn').forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.sample === sampleId);
+                });
+
+                if (payload.id) {
+                    document.getElementById('request-id').value = payload.id;
+                }
+                if (payload.tmax) {
+                    document.getElementById('tmax').value = payload.tmax;
+                }
+            } catch (error) {
+                console.error('Failed to load sample:', error);
+            }
+        }
+
+        function clearPayload() {
+            document.getElementById('payload').value = '';
+            document.querySelectorAll('.sample-btn').forEach(btn => btn.classList.remove('active'));
+        }
+
+        function formatPayload() {
+            const textarea = document.getElementById('payload');
+            try {
+                const parsed = JSON.parse(textarea.value);
+                textarea.value = JSON.stringify(parsed, null, 2);
+            } catch (e) {
+                alert('Invalid JSON: ' + e.message);
+            }
+        }
+
+        document.querySelectorAll('.sample-btn').forEach(btn => {
+            btn.addEventListener('click', () => loadSample(btn.dataset.sample));
+        });
+
+        window.addEventListener('load', initSession);
+    </script>
+</body>
+</html>
