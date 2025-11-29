@@ -312,6 +312,9 @@ func (h *Handler) RegisterRoutes(mux *http.ServeMux) {
 	// Specification page
 	mux.HandleFunc("/spec", h.handleSpec)
 
+	// Container guide page
+	mux.HandleFunc("/container", h.handleContainer)
+
 	// Main page
 	mux.HandleFunc("/", h.handleIndex)
 }
@@ -325,6 +328,17 @@ func (h *Handler) handleSpec(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	w.Write(specFile)
+}
+
+// handleContainer serves the container guide page
+func (h *Handler) handleContainer(w http.ResponseWriter, r *http.Request) {
+	containerFile, err := staticFiles.ReadFile("static/container.html")
+	if err != nil {
+		http.Error(w, "Container guide not found", http.StatusNotFound)
+		return
+	}
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	w.Write(containerFile)
 }
 
 // handleIndex serves the main page

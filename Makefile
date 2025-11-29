@@ -14,6 +14,11 @@ VERSION?=0.10.0
 BUILD_TIME=$(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
 LDFLAGS=-ldflags "-X main.Version=$(VERSION) -X main.BuildTime=$(BUILD_TIME) -w -s"
 
+# Agent manifest configuration (customizable via environment or make args)
+AGENT_NAME?=artf-reference-agent
+AGENT_VENDOR?=IAB Tech Lab
+AGENT_OWNER?=artf@iabtechlab.com
+
 # Default ports
 GRPC_PORT?=50051
 MCP_PORT?=50052
@@ -55,10 +60,14 @@ help:
 	@echo "  make health-check       Check health endpoints"
 	@echo ""
 	@echo "Docker Commands:"
-	@echo "  make docker-build       Build Docker image"
-	@echo "  make docker-run         Run Docker container"
-	@echo "  make docker-run-all     Run Docker with all services"
-	@echo "  make docker-compose-up  Start with docker-compose"
+	@echo "  make docker-build         Build Docker image with agent-manifest"
+	@echo "  make docker-run           Run Docker container"
+	@echo "  make docker-run-all       Run Docker with all services"
+	@echo "  make docker-inspect-manifest  Show agent-manifest label"
+	@echo "  make docker-compose-up    Start with docker-compose"
+	@echo ""
+	@echo "  Custom agent manifest (example):"
+	@echo "    make docker-build AGENT_NAME=my-agent AGENT_VENDOR=\"My Corp\" VERSION=1.0.0"
 	@echo ""
 	@echo "Sample Commands:"
 	@echo "  make sample-banner      Send sample banner request via MCP"
@@ -160,10 +169,18 @@ run-dev: build
 # Docker Commands
 #
 
-## docker-build: Build Docker image
+## docker-build: Build Docker image with agent-manifest label
 docker-build:
 	@echo "Building Docker image..."
-	docker build -t $(DOCKER_IMAGE):$(VERSION) -t $(DOCKER_IMAGE):latest .
+	@echo "  Agent: $(AGENT_NAME) v$(VERSION)"
+	@echo "  Vendor: $(AGENT_VENDOR)"
+	docker build \
+		--build-arg VERSION=$(VERSION) \
+		--build-arg AGENT_NAME="$(AGENT_NAME)" \
+		--build-arg AGENT_VENDOR="$(AGENT_VENDOR)" \
+		--build-arg AGENT_OWNER="$(AGENT_OWNER)" \
+		-t $(DOCKER_IMAGE):$(VERSION) \
+		-t $(DOCKER_IMAGE):latest .
 
 ## docker-run: Run Docker container with gRPC
 docker-run:
@@ -184,6 +201,12 @@ docker-compose-up:
 ## docker-compose-down: Stop docker-compose services
 docker-compose-down:
 	docker-compose down
+
+## docker-inspect-manifest: Show the agent-manifest label from the Docker image
+docker-inspect-manifest:
+	@echo "Agent Manifest for $(DOCKER_IMAGE):$(VERSION):"
+	@docker inspect $(DOCKER_IMAGE):$(VERSION) --format '{{index .Config.Labels "agent-manifest"}}' | python3 -m json.tool 2>/dev/null || \
+		docker inspect $(DOCKER_IMAGE):$(VERSION) --format '{{index .Config.Labels "agent-manifest"}}'
 
 #
 # Dependency Commands
