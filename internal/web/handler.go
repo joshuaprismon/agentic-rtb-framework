@@ -309,8 +309,22 @@ func (h *Handler) RegisterRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("/api/samples", h.handleListSamples)
 	mux.HandleFunc("/api/samples/", h.handleGetSample)
 
+	// Specification page
+	mux.HandleFunc("/spec", h.handleSpec)
+
 	// Main page
 	mux.HandleFunc("/", h.handleIndex)
+}
+
+// handleSpec serves the ARTF specification page
+func (h *Handler) handleSpec(w http.ResponseWriter, r *http.Request) {
+	specFile, err := staticFiles.ReadFile("static/spec.html")
+	if err != nil {
+		http.Error(w, "Specification not found", http.StatusNotFound)
+		return
+	}
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	w.Write(specFile)
 }
 
 // handleIndex serves the main page
