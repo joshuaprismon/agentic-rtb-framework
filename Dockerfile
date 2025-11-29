@@ -1,8 +1,5 @@
 # Build stage
-FROM golang:1.23-alpine AS builder
-
-# Install build dependencies
-RUN apk add --no-cache git ca-certificates tzdata
+FROM golang:1.23 AS builder
 
 # Set working directory
 WORKDIR /app
@@ -17,24 +14,28 @@ RUN go mod download
 COPY . .
 
 # Build the binary
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build \
+RUN CGO_ENABLED=0 GOOS=linux go build \
     -ldflags="-w -s" \
     -o /artf-agent \
     ./cmd/agent
 
 # Runtime stage
-FROM scratch
+FROM ubuntu:24.04
 
-# Import certificates and timezone data from builder
-COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
-COPY --from=builder /usr/share/zoneinfo /usr/share/zoneinfo
+# Install CA certificates for HTTPS
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \
+    tzdata \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create non-root user (required by ARTF spec)
+RUN useradd -r -u 65534 -s /bin/false artf
 
 # Copy the binary
 COPY --from=builder /artf-agent /artf-agent
 
-# Create non-root user (required by ARTF spec)
-# Note: scratch image doesn't support adduser, so we set USER to numeric ID
-USER 65534:65534
+# Use non-root user
+USER artf
 
 # Expose ports
 EXPOSE 50051 8080
@@ -47,4 +48,4 @@ HEALTHCHECK --interval=5s --timeout=3s --start-period=5s --retries=3 \
 ENTRYPOINT ["/artf-agent"]
 
 # Default arguments
-CMD ["-grpc-port=50051", "-health-port=8080"]
+CMD ["--grpc-port=50051", "--health-port=8080"]
