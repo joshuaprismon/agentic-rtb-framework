@@ -814,9 +814,9 @@
     <!-- Page Title -->
     <section class="page-title">
         <div class="container">
-            <span class="badge">MCP Tool Tester</span>
+            <span class="badge">gRPC &amp; MCP Tester</span>
             <h1>Extend RTB Tool</h1>
-            <p>Test the Model Context Protocol interface for OpenRTB bidstream mutations</p>
+            <p>Test the gRPC and MCP interfaces for OpenRTB bidstream mutations</p>
         </div>
     </section>
 
@@ -827,6 +827,8 @@
             <div class="info-bar">
                 <div>
                     <strong>MCP Endpoint:</strong> <code>{{.MCPEndpoint}}</code>
+                    &nbsp;&nbsp;|&nbsp;&nbsp;
+                    <strong>gRPC:</strong> <code>localhost:50051</code>
                 </div>
                 <div class="connection-status">
                     <span class="status-dot" id="status-dot"></span>
@@ -899,8 +901,8 @@
                                 <div class="flow-step">
                                     <div class="flow-number">2</div>
                                     <div class="flow-content">
-                                        <div class="flow-title">Agent Invocation</div>
-                                        <div class="flow-desc">Platform invokes ARTF agent via gRPC or MCP with request data</div>
+                                        <div class="flow-title">Agent Invocation (gRPC or MCP)</div>
+                                        <div class="flow-desc">Platform invokes ARTF agent via gRPC (protobuf) or MCP (JSON-RPC) with request data</div>
                                     </div>
                                 </div>
                                 <div class="flow-step">
