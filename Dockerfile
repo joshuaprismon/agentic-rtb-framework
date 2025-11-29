@@ -28,14 +28,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     tzdata \
     && rm -rf /var/lib/apt/lists/*
 
-# Create non-root user (required by ARTF spec)
-RUN useradd -r -u 65534 -s /bin/false artf
-
 # Copy the binary
 COPY --from=builder /artf-agent /artf-agent
 
-# Use non-root user
-USER artf
+# Use non-root user (nobody already exists in Ubuntu with UID 65534)
+USER nobody
 
 # Expose ports
 EXPOSE 50051 8080
