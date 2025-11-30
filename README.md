@@ -212,6 +212,81 @@ This implementation follows ARTF security requirements:
 - [Implementation Specification](docs/00-EXAMPLE.md)
 - [MCP Integration Guide](docs/01-MCP.md)
 
+### AI Assistant Integration (MCP)
+
+The ARTF agent can be added as an MCP server to AI assistants that support the Model Context Protocol, giving them access to the `extend_rtb` tool for processing OpenRTB bid requests.
+
+#### Claude Desktop
+
+Add to your Claude Desktop configuration file:
+
+**macOS:** `~/Library/Application Support/Claude/claude_desktop_config.json`
+**Windows:** `%APPDATA%\Claude\claude_desktop_config.json`
+**Linux:** `~/.config/Claude/claude_desktop_config.json`
+
+```json
+{
+  "mcpServers": {
+    "artf": {
+      "command": "/path/to/artf-agent",
+      "args": ["--enable-mcp", "--enable-grpc=false"],
+      "env": {}
+    }
+  }
+}
+```
+
+After saving, restart Claude Desktop. The `extend_rtb` tool will be available for RTB mutation requests.
+
+#### Claude Code (CLI)
+
+Create a `.mcp.json` file in your project root or home directory:
+
+```json
+{
+  "mcpServers": {
+    "artf": {
+      "command": "/path/to/artf-agent",
+      "args": ["--enable-mcp", "--enable-grpc=false"],
+      "env": {}
+    }
+  }
+}
+```
+
+Or add to your existing Claude Code settings.
+
+#### Remote MCP Server (HTTP)
+
+For remote deployments, run the agent with MCP enabled and connect via HTTP:
+
+```bash
+# Start the agent with MCP over HTTP
+./artf-agent --enable-mcp --enable-web --web-port=8081
+
+# MCP endpoint will be available at: http://localhost:8081/mcp
+```
+
+For Claude Desktop with a remote server, use an MCP proxy or configure your client to connect to the HTTP endpoint.
+
+#### ChatGPT
+
+ChatGPT does not natively support MCP. However, you can:
+
+1. **Use the Web UI** - Access the built-in testing interface at `http://localhost:8081`
+2. **Custom GPT with Actions** - Create a Custom GPT that calls the MCP HTTP endpoint via Actions (requires exposing the endpoint publicly)
+3. **API Integration** - Use the gRPC or MCP HTTP API directly in your application
+
+#### Available MCP Tool
+
+Once connected, the following tool is available:
+
+| Tool | Description |
+|------|-------------|
+| `extend_rtb` | Process OpenRTB bid request/response and return proposed mutations |
+
+Example prompt: *"Use extend_rtb to activate segments for a user born in 1990 viewing a sports website"*
+
 ---
 
 #### About IAB Tech Lab
