@@ -38,9 +38,32 @@ This project implements a multi-protocol server that conforms to the ARTF specif
 
 #### Prerequisites
 
-- Go 1.22+
-- Protocol Buffers compiler (`protoc`)
+- Go 1.23+
+- Protocol Buffers compiler (`protoc`) v3.21+
 - Docker (optional, for containerized deployment)
+
+#### Critical Dependencies
+
+The following tools must be installed to generate protobuf code:
+
+| Tool | Version | Installation |
+|------|---------|--------------|
+| `protoc` | 3.21+ | System package manager or [releases](https://github.com/protocolbuffers/protobuf/releases) |
+| `protoc-gen-go` | 1.34+ | `go install google.golang.org/protobuf/cmd/protoc-gen-go@latest` |
+| `protoc-gen-go-grpc` | 1.4+ | `go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest` |
+
+**Important:** Ensure `$(go env GOPATH)/bin` is in your `PATH`:
+```bash
+export PATH="$PATH:$(go env GOPATH)/bin"
+```
+
+Go module dependencies (managed via `go.mod`):
+
+| Package | Version | Purpose |
+|---------|---------|---------|
+| `google.golang.org/grpc` | 1.64.0 | gRPC framework |
+| `google.golang.org/protobuf` | 1.34.1 | Protocol Buffers runtime |
+| `github.com/mark3labs/mcp-go` | 0.43.1 | Model Context Protocol server |
 
 #### Build and Run
 

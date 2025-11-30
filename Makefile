@@ -81,7 +81,7 @@ fetch-openrtb:
 	@mkdir -p $(OPENRTB_PROTO_DIR)
 	@curl -sSL $(OPENRTB_PROTO_SRC) -o $(OPENRTB_PROTO_FILE).tmp
 	@echo "Adding go_package option for ARTF compatibility..."
-	@sed '/^package /a\'$$'\n''option go_package = "github.com/iabtechlab/agentic-rtb-framework/pkg/pb/openrtb";' $(OPENRTB_PROTO_FILE).tmp > $(OPENRTB_PROTO_FILE)
+	@sed '/^package /a\option go_package = "github.com/iabtechlab/agentic-rtb-framework/pkg/pb/openrtb";' $(OPENRTB_PROTO_FILE).tmp > $(OPENRTB_PROTO_FILE)
 	@rm -f $(OPENRTB_PROTO_FILE).tmp
 	@echo "OpenRTB 2.6 proto downloaded to $(OPENRTB_PROTO_FILE)"
 
