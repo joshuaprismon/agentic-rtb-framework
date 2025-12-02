@@ -21,32 +21,182 @@ pub mod com {
     }
 }
 
-use com::iabtechlab::bidstream::mutation::v1::rtb_extension_point_server::{
-    RtbExtensionPoint, RtbExtensionPointServer
-};
-use com::iabtechlab::bidstream::mutation::v1::{
-    RtbRequest, RtbResponse, Mutation, Operation, Intent, Metadata
-};
+use com::iabtechlab::bidstream::mutation::v1::*;
+use crate::mutation::Value::Ids;
+use crate::mutation::Value::AdjustBid;
+use crate::rtb_extension_point_server::RtbExtensionPointServer;
 
+const API_VERSION: &str = "1.0.0";
+const MODEL_VERSION: &str = "v0.10.0";
 
-const VERSION: &'static str = "0.1.0";
-
-// Evaluate the RTBRequest and return a RtbResponse
+// Evaluate the RtbRequest and return a RtbResponse
 async fn evaluate(req: RtbRequest) -> RtbResponse {
-    let result: RtbResponse = com::iabtechlab::bidstream::mutation::v1::RtbResponse {
-        id: req.id,
-        mutations: Vec::<Mutation>::new(),
-        metadata: Some(Metadata::default())
+    // For demonstration purposes, we will create a static response
+    // In a real-world scenario, you would implement logic to evaluate the request
+    // and determine the appropriate mutations based on the request data.
+    let metadata = Metadata {
+        api_version: Some(API_VERSION.to_string()),
+        model_version: Some(MODEL_VERSION.to_string())
     };
 
-    result
+    match req.id.as_str() {
+        "auction-123" => RtbResponse {
+            id: req.id,
+            mutations: vec![
+                Mutation {
+                    intent: Intent::ActivateSegments.into(),    // Activate segment(s) for the user
+                    op: Operation::Add.into(),  // Add the segment(s) to the user
+                    path: "/user/data/segment".to_string(), // Path to the user data segment in ORTB object
+                    value: Some(Ids(IDsPayload {    // Payload containing the segment IDs to be added
+                        id: vec![
+                            "seg-sports".to_string(), 
+                            "demo-25-35".to_string(),
+                            "gender-male".to_string()
+                            ],
+                    })),
+                },
+                Mutation {
+                    intent: Intent::ActivateDeals.into(),   // Activate deal(s) to the impression
+                    op: Operation::Add.into(),  // Add the deal(s) to the impression
+                    path: "/imp/imp-1".to_string(), // Path to the impression in ORTB object
+                    value: Some(Ids(IDsPayload {    // Payload containing the deal IDs to be added
+                        id: vec!["display-deal-001".to_string()],
+                    }))
+                }
+            ],
+            metadata: Some(metadata)
+        },
+        "auction-456" => RtbResponse {
+            id: req.id,
+            mutations: vec![
+                Mutation {
+                    intent: Intent::ActivateSegments.into(),    // Activate segment(s) for the user
+                    op: Operation::Add.into(),  // Add the segment(s) to the user
+                    path: "/user/data/segment".to_string(), // Path to the user data segment in ORTB object
+                    value: Some(Ids(IDsPayload {    // Payload containing the segment IDs to be added
+                        id: vec!["demo-35-44".to_string()]
+                    })),
+                },
+                Mutation {
+                    intent: Intent::ActivateDeals.into(),   // Activate deal(s) to the impression
+                    op: Operation::Add.into(),  // Add the deal(s) to the impression
+                    path: "/imp/imp-1".to_string(), // Path to the impression in ORTB object
+                    value: Some(Ids(IDsPayload {    // Payload containing the deal IDs to be added
+                        id: vec![
+                            "premium-deal-001".to_string(), 
+                            "video-deal-001".to_string()
+                            ]
+                    }))
+                }
+            ],
+            metadata: Some(metadata)
+        },
+        "auction-789" => RtbResponse {
+            id: req.id,
+            mutations: vec![
+                Mutation {
+                    intent: Intent::ActivateSegments.into(),    // Activate segment(s) for the user
+                    op: Operation::Add.into(),  // Add the segment(s) to the user
+                    path: "/user/data/segment".to_string(), // Path to the user data segment in ORTB object
+                    value: Some(Ids(IDsPayload {    // Payload containing the segment IDs to be added
+                        id: vec!["demo-45-plus".to_string()],
+                    })),
+                },
+                Mutation {
+                    intent: Intent::ActivateDeals.into(),   // Activate deal(s) to the impression
+                    op: Operation::Add.into(),  // Add the deal(s) to the impression
+                    path: "/imp/imp-1".to_string(), // Path to the impression in ORTB object
+                    value: Some(Ids(IDsPayload {    // Payload containing the deal IDs to be added
+                        id: vec!["display-deal-001".to_string()],
+                    }))
+                },
+                Mutation {
+                    intent: Intent::BidShade.into(),   // Activate deal(s) to the impression
+                    op: Operation::Replace.into(),  // Add the deal(s) to the impression
+                    path: "/seatbid/dsp-001/bid/bid-abc".to_string(), // Path to the impression in ORTB object
+                    value: Some(AdjustBid(AdjustBidPayload {
+                        price: Some(4.675) 
+                    }))
+                }
+            ],
+            metadata: Some(metadata)
+        },
+        "auction-multi-123" => RtbResponse {
+            id: req.id,
+            mutations: vec![
+                Mutation {
+                    intent: Intent::ActivateSegments.into(),    // Activate segment(s) for the user
+                    op: Operation::Add.into(),  // Add the segment(s) to the user
+                    path: "/user/data/segment".to_string(), // Path to the user data segment in ORTB object
+                    value: Some(Ids(IDsPayload {    // Payload containing the segment IDs to be added
+                        id: vec![
+                            "demo-35-44".to_string(), 
+                            "gender-female".to_string()
+                            ],
+                    })),
+                },
+                Mutation {
+                    intent: Intent::ActivateDeals.into(),   // Activate deal(s) to the impression
+                    op: Operation::Add.into(),  // Add the deal(s) to the impression
+                    path: "/imp/imp-header".to_string(), // Path to the impression in ORTB object
+                    value: Some(Ids(IDsPayload {    // Payload containing the deal IDs to be added
+                        id: vec!["display-deal-001".to_string()],
+                    })),
+                },
+                Mutation {
+                    intent: Intent::ActivateDeals.into(),   // Activate deal(s) to the impression
+                    op: Operation::Add.into(),  // Add the deal(s) to the impression
+                    path: "/imp/imp-sidebar".to_string(), // Path to the impression in ORTB object
+                    value: Some(Ids(IDsPayload {    // Payload containing the deal IDs to be added
+                        id: vec!["display-deal-001".to_string()],
+                    })),
+                },
+                Mutation {
+                    intent: Intent::ActivateDeals.into(),   // Activate deal(s) to the impression
+                    op: Operation::Add.into(),  // Add the deal(s) to the impression
+                    path: "/imp/imp-footer".to_string(), // Path to the impression in ORTB object
+                    value: Some(Ids(IDsPayload {    // Payload containing the deal IDs to be added
+                        id: vec!["display-deal-001".to_string()],
+                    })),
+                }
+            ],
+            metadata: Some(metadata)
+        },
+        "app-123" => RtbResponse {
+            id: req.id,
+            mutations: vec![
+                Mutation {
+                    intent: Intent::ActivateSegments.into(),    // Activate segment(s) for the user
+                    op: Operation::Add.into(),  // Add the segment(s) to the user
+                    path: "/user/data/segment".to_string(), // Path to the user data segment in ORTB object
+                    value: Some(Ids(IDsPayload {    // Payload containing the segment IDs to be added
+                        id: vec!["demo-18-24".to_string()],
+                    })),
+                },
+                Mutation {
+                    intent: Intent::ActivateDeals.into(),   // Activate deal(s) to the impression
+                    op: Operation::Add.into(),  // Add the deal(s) to the impression
+                    path: "/imp/imp-1".to_string(), // Path to the impression in ORTB object
+                    value: Some(Ids(IDsPayload {    // Payload containing the deal IDs to be added
+                        id: vec!["native-deal-001".to_string()],
+                    })),
+                }
+            ],
+            metadata: Some(metadata)
+        },
+        _ => RtbResponse {
+            id: req.id,
+            mutations: vec![],
+            metadata: Some(metadata),
+        }
+    }
 }
 
 #[derive(Default)]
 pub struct RtbExtensionPointService {}
 
 #[tonic::async_trait]
-impl RtbExtensionPoint for RtbExtensionPointService {
+impl rtb_extension_point_server::RtbExtensionPoint for RtbExtensionPointService {
     async fn get_mutations (
         &self,
         request: Request<RtbRequest>,
@@ -85,8 +235,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let addr = format!("{}:{}", address, port).parse().unwrap();
     let agentic_rtb_framework_service = RtbExtensionPointServer::new(RtbExtensionPointService::default());
 
-    println!("Agentic RTB Framework gRPC Server Version: {}", VERSION);
-    println!("Setting gRPC Server Max connections: {}", max_server_connection);
+    println!("Agentic RTB Framework API Version: {}", API_VERSION);
+    println!("Agentic RTB Framework Model Version: {}", MODEL_VERSION);
+    println!("Setting Server Max connections: {}", max_server_connection);
     println!("Starting gRPC Server at: {}:{}", address, port);
 
     Server::builder()
