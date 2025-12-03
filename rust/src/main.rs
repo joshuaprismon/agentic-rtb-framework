@@ -22,9 +22,10 @@ pub mod com {
 }
 
 use com::iabtechlab::bidstream::mutation::v1::*;
+use crate::rtb_extension_point_server::RtbExtensionPointServer;
+
 use crate::mutation::Value::Ids;
 use crate::mutation::Value::AdjustBid;
-use crate::rtb_extension_point_server::RtbExtensionPointServer;
 
 const API_VERSION: &str = "1.0.0";
 const MODEL_VERSION: &str = "v0.10.0";
