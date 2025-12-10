@@ -3,6 +3,10 @@ use std::{env, str};
 use futures::Stream;
 use tokio_stream::StreamExt;
 use tonic::{transport::Server, Request, Response, Status};
+use hyper::{Method, StatusCode, Server as HyperServer};
+use hyper::service::{make_service_fn, service_fn};
+use std::convert::Infallible;
+use std::net::SocketAddr;
 
 pub mod com {
     pub mod iabtechlab {
@@ -193,6 +197,23 @@ async fn evaluate(req: RtbRequest) -> RtbResponse {
     }
 }
 
+async fn handle_rest(req: hyper::Request<hyper::body::Body>) -> Result<hyper::Response<hyper::body::Body>, Infallible> {
+    match (req.method(), req.uri().path()) {
+        (&Method::GET, "/health/live") => {
+            Ok(hyper::Response::new(hyper::body::Body::from("OK")))
+        },
+        (&Method::GET, "/health/ready") => {
+            Ok(hyper::Response::new(hyper::body::Body::from("OK")))
+        },
+        _ => {
+            Ok(hyper::Response::builder()
+                .status(StatusCode::NOT_FOUND)
+                .body(hyper::body::Body::from("Not Found"))
+                .unwrap())
+        }
+    }
+}
+
 #[derive(Default)]
 pub struct RtbExtensionPointService {}
 
@@ -229,23 +250,56 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     tonic_prost_build::compile_protos("proto/agenticrtbframework.proto").unwrap_or_else(|e| panic!("Failed to compile protos {:?}", e));
 
     // gRPC server environment variables
-    let address = env::var("ARTF_SERVER_ADDRESS").unwrap_or_else(|_| "0.0.0.0".to_string()).parse::<String>().unwrap();
-    let port = env::var("ARTF_SERVER_PORT").unwrap_or_else(|_| "50051".to_string()).parse::<u16>().unwrap();
+    let address = env::var("ARTF_GRPC_SERVER_ADDRESS").unwrap_or_else(|_| "0.0.0.0".to_string()).parse::<String>().unwrap();
+    let grpc_port = env::var("ARTF_GRPC_SERVER_PORT").unwrap_or_else(|_| "50051".to_string()).parse::<u16>().unwrap();
+    let http_port = env::var("ARTF_HTTP_SERVER_PORT").unwrap_or_else(|_| "8080".to_string()).parse::<u16>().unwrap();
     let max_server_connection: u16 = env::var("ARTF_MAX_CONNS").unwrap_or_else(|_| "256".to_string()).parse::<u16>().unwrap();
    
-    let addr = format!("{}:{}", address, port).parse().unwrap();
+    let grpc_addr = format!("{}:{}", address, grpc_port).parse().unwrap();
     let agentic_rtb_framework_service = RtbExtensionPointServer::new(RtbExtensionPointService::default());
 
     println!("Agentic RTB Framework API Version: {}", API_VERSION);
     println!("Agentic RTB Framework Model Version: {}", MODEL_VERSION);
-    println!("Setting Server Max connections: {}", max_server_connection);
-    println!("Starting gRPC Server at: {}:{}", address, port);
+    println!("Setting gRPC Server Max connections: {}", max_server_connection);
+    println!("Starting gRPC Server at: {}:{}", address, grpc_port);
+    println!("Starting HTTP Server at: {}:{}", address, http_port);
 
-    Server::builder()
-        .concurrency_limit_per_connection(max_server_connection as usize)
-        .add_service(agentic_rtb_framework_service)
-        .serve(addr)
-        .await?;
+    let grpc_server = tokio::spawn(async move{
+        Server::builder()
+            .concurrency_limit_per_connection(max_server_connection as usize)
+            .add_service(agentic_rtb_framework_service)
+            .serve(grpc_addr)
+            .await
+
+    });
+
+    let rest_server = tokio::spawn(async move {
+        let make_svc = make_service_fn(|_conn| async {
+            Ok::<_, Infallible>(service_fn(handle_rest))
+        });
+
+        let rest_addr: SocketAddr = format!("{}:{}", address, http_port).parse().unwrap();
+
+        HyperServer::bind(&rest_addr)
+            .serve(make_svc)
+            .await
+    });
+
+    // Wait for both servers (or handle their errors)
+    tokio::select! {
+        result = grpc_server => {
+            match result {
+                Ok(_) => println!("gRPC Server stopped successfully."),
+                Err(e) => eprintln!("gRPC Server encountered an error: {:?}", e),
+            }
+        }
+        result = rest_server => {
+            match result {
+                Ok(_) => println!("HTTP Server stopped successfully."),
+                Err(e) => eprintln!("HTTP Server encountered an error: {:?}", e),
+            }
+        }
+    }
 
     Ok(())
 }

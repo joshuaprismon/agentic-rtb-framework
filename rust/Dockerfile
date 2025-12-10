@@ -13,17 +13,14 @@ LABEL agent-manifest='{ \
         "intents"=["ACTIVATE_SEGMENTS", "ACTIVATE_DEALS", "BID_SHADE"], \
         "description": "Agentic RTB Framework Service"  \
         "dependencies": { \
-            "audienceService": {  \
-                "service": "audience-svc",  \
-                "port": 50051  \
-            }   \
+            "audienceService": {"service": "audience-svc",  "port": 50051}   \
         },  \
         "health": {   \
             "livenessProbe": {    \
                 "httpGet": { "path": "/health/live", "port": 8080 } \
             },  \
             "readinessProbe": {   \
-            "httpGet": { "path": "/health/ready", "port": 8080 }    \
+                "httpGet": { "path": "/health/ready", "port": 8080 }    \
             }   \
         } \
     }'
@@ -42,9 +39,10 @@ RUN cargo install --path .
 RUN apt-get update && apt-get install -y protobuf-compiler
 
 ENV OUT_DIR=${BASE_DIR}/proto
-ENV ARTF_SERVER_PORT=50051
-ENV ARTF_MAX_CONNS=256
+ENV ARTF_GRPC_SERVER_PORT=50051
+ENV ARTF_GRPC_MAX_CONNS=256
+ENV ARTF_HTTP_SERVER_PORT=8080
 
-EXPOSE ${ARTF_SERVER_PORT}
+EXPOSE ${ARTF_GRPC_SERVER_PORT} ${ARTF_HEALTH_SERVER_PORT}
 
 ENTRYPOINT ["agentic-rtb-framework-service"]
