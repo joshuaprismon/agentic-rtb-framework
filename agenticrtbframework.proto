@@ -1,79 +1,88 @@
-syntax = "proto2";
+edition = "2023";
 
 package com.iabtechlab.bidstream.mutation.v1;
 
-// Import OpenRTB definitions
+// Import OpenRTB definitions for BidRequest and BidResponse
 import "com/iabtechlab/openrtb/v2.6/openrtb.proto";
-
-
-// ------------------- Services -------------------
-
-service RTBExtensionPoint {
-  // GetMutations returns RTBResponse containing mutations to be applied at the predetermined auction lifecycle event
-  rpc GetMutations (RTBRequest) returns (RTBResponse);
-}
 
 // ------------------- Messages -------------------
 
 message RTBRequest {
-  // ENUM as per Programmatic Auction Definition IAB TL doc/spec
-  required Lifecycle lifecycle = 1;
+  // As per Programmatic Auction Definition IAB TL doc/spec
+  Lifecycle lifecycle = 1;
 
   // ID of the extension point request, assigned by the exchange, and unique for the
   // exchange's subsequent tracking of the responses. The exchange may use
   // different values for different recipients.
-  // REQUIRED by the RTB specification.
-  required string id = 2;
+  string id = 2;
 
   // Maximum time in milliseconds the exchange allows for mutations to be received including latency to avoid timeout
-  // REQUIRED by the RTB specification.
-  required int32 tmax = 3;
+  int32 tmax = 3;
 
   // Bid request
-  // REQUIRED by the RTB specification.
-  required com.iabtechlab.openrtb.v2_6.BidRequest bid_request = 4;
+  com.iabtechlab.openrtb.v2.BidRequest bid_request = 4;
 
   // Bid response
-  // OPTIONAL by the RTB specification.
-  optional com.iabtechlab.openrtb.v2_6.BidResponse bid_response = 5;
+  com.iabtechlab.openrtb.v2.BidResponse bid_response = 5;
+
+  // Business entity that created and owns the enclosed BidRequest or BidResponse
+  Originator originator = 6;
+
+  // List of intents the server is eligibible to send back
+  repeated Intent applicable_intents = 7;
 
   // Extension fields
-  optional Extensions ext = 6;
+  Ext ext = 99;
+
+  message Ext {
+    extensions 500 to max;
+  }
 }
 
 enum Lifecycle {
   // Placeholder to Define Programmatic Auction Definition Stages
   LIFECYCLE_UNSPECIFIED = 0;
-  
-  // More to be added
-}
 
-message Extensions {
-  // Placeholder for future fields
-  extensions 100 to max;
+  LIFECYCLE_PUBLISHER_BID_REQUEST = 1;
+
+  LIFECYCLE_DSP_BID_RESPONSE = 2;
+
+  // More to be added
 }
 
 message RTBResponse {
   // ID of the extension point request to which this is a response.
-  // REQUIRED by the RTB specification.
-  required string id = 1;
+  string id = 1;
 
   // List of mutations suggesting changes to be applied
   repeated Mutation mutations = 2;
 
   // Metadata about the response
-  optional Metadata metadata = 3;
+  Metadata metadata = 3;
+}
+
+message Originator {
+  enum Type {
+    TYPE_UNSPECIFIED = 0;
+    TYPE_PUBLISHER = 1;
+    TYPE_SSP = 2;
+    TYPE_EXCHANGE = 3;
+    TYPE_DSP = 4;
+  }
+
+  Type type = 1;
+  string id = 2;
 }
 
 message Mutation {
   // The purpose of the mutation
-  required Intent intent = 1;
+  Intent intent = 1;
 
   // Defines the operation to perform (e.g. add, remove, replace) on the target data at the given path
-  required Operation op = 2;
+  Operation op = 2;
 
   // The semantic business domain of where the operation will be applied
-  required string path = 3;
+  string path = 3;
 
   // The structure of value depends on the specified intent.
   // Reserve 100+ for intent-specific payloads
@@ -87,9 +96,15 @@ message Mutation {
     // Adjust the bid price
     AdjustBidPayload adjust_bid = 102;
 
-    // Add metrics or telemetry data
-    AddMetricsPayload add_metrics = 103;
+    // Metrics or telemetry data
+    MetricsPayload metrics = 103;
+
+    // Content data
+    DataPayload content_data = 104;
   }
+
+  // Reserved for experimental/test payloads
+  reserved 1000 to 1999;
 }
 
 enum Operation {
@@ -125,15 +140,21 @@ enum Intent {
   // Add metrics to an impression
   ADD_METRICS = 7;
 
+  // Add extended content IDs
+  ADD_CIDS = 8;
+
   // More intents can be added in the future
+
+  // Reserved for experimental/test intents
+  reserved 1000 to 1999;
 }
 
 message Metadata {
   // Version of the data provider API
-  optional string api_version = 1;
+  string api_version = 1;
 
   // The model version utilized by the container or API to compute the mutation if applicable
-  optional string model_version = 2;
+  string model_version = 2;
 
   // More metadata fields can be added in the future
 }
@@ -144,16 +165,16 @@ message IDsPayload {
 }
 
 message AdjustDealPayload {
-  //  Suggested bid floor for the deal
-  optional double bidfloor = 1;
+  // Suggested bid floor for the deal
+  double bidfloor = 1;
 
   // Suggested margin for the deal
-  optional Margin margin = 2;
+  Margin margin = 2;
 }
 
 message Margin {
   // The adjusted margin value
-  optional double value = 1;
+  double value = 1;
 
   // The type of margin adjustment
   enum CalculationType {
@@ -164,15 +185,20 @@ message Margin {
     PERCENT = 1;
   }
 
-  optional CalculationType calculation_type = 2;
+  CalculationType calculation_type = 2;
 }
 
 message AdjustBidPayload {
   // The adjusted bid price
-  optional double price = 1;
+  double price = 1;
 }
 
-message AddMetricsPayload {
+message MetricsPayload {
   // List of metrics to add
-  repeated com.iabtechlab.openrtb.v2_6.BidRequest.Imp.Metric metric = 1;
+  repeated com.iabtechlab.openrtb.v2.BidRequest.Metric metric = 1;
+}
+
+message DataPayload {
+  // List of data to add
+  repeated com.iabtechlab.openrtb.v2.BidRequest.Data data = 1;
 }
