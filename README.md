@@ -5,6 +5,17 @@
 #### About Agentic RTB Framework (ARTF)
 https://iabtechlab.com/standards/artf/
 
+#### How to get started
+
+Download the openRTB official 2.6 Protocol Buffers specification from https://github.com/InteractiveAdvertisingBureau/openrtb2.x/blob/main/proto/src/main/com/iabtechlab/openrtb/v2/openrtb.proto to this directory.
+
+From the command line:
+
+1. Install `make` and the latest version of `protoc`.
+2. Open the `Makefile` and choose the language(s) for which the Protocol Buffers
+   object code should be generated.
+3. Run `make`.
+
 #### Contact
 For more information, or to get involved, please email support@iabtechlab.com.
 
