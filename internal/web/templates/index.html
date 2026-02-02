@@ -1239,13 +1239,16 @@
 
             if (response.mutations && response.mutations.length > 0) {
                 response.mutations.forEach((mutation, i) => {
+                    // Extract the payload from protobuf oneof value field
+                    const payload = mutation.ids || mutation.adjust_deal || mutation.adjust_bid ||
+                                   mutation.metrics || mutation.content_data || mutation.value || null;
                     html += `<div class="mutation">
                         <div class="mutation-header">
                             <span class="mutation-intent">${mutation.intent}</span>
                             <span class="mutation-op">${mutation.op}</span>
                         </div>
                         <div class="mutation-path">Path: ${mutation.path}</div>
-                        <pre>${JSON.stringify(mutation.value, null, 2)}</pre>
+                        <pre>${payload ? JSON.stringify(payload, null, 2) : 'No payload'}</pre>
                     </div>`;
                 });
             } else {
@@ -1254,8 +1257,8 @@
 
             if (response.metadata) {
                 html += `<div class="response-meta">
-                    <strong>API Version:</strong> ${response.metadata.api_version} &nbsp;|&nbsp;
-                    <strong>Model:</strong> ${response.metadata.model_version}
+                    <strong>API Version:</strong> ${response.metadata.api_version || response.metadata.apiVersion} &nbsp;|&nbsp;
+                    <strong>Model:</strong> ${response.metadata.model_version || response.metadata.modelVersion}
                 </div>`;
             }
 

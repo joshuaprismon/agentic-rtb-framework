@@ -41,7 +41,8 @@ func NewARTFAgent(h *handlers.MutationHandlers) *ARTFAgent {
 	}
 }
 
-// GetMutations processes an RTB request and returns proposed mutations
+// GetMutations processes an RTB request and returns proposed mutations.
+// Respects applicable_intents from the request to filter which mutation types are returned.
 func (a *ARTFAgent) GetMutations(ctx context.Context, req *pb.RTBRequest) (*pb.RTBResponse, error) {
 	startTime := time.Now()
 
@@ -62,17 +63,23 @@ func (a *ARTFAgent) GetMutations(ctx context.Context, req *pb.RTBRequest) (*pb.R
 	bidRequest := req.GetBidRequest()
 	bidResponse := req.GetBidResponse()
 
-	log.Printf("Processing request %s at lifecycle stage %v", req.GetId(), lifecycle)
+	// NOTE: applicable_intents is defined in the proto spec but not yet in the generated Go code.
+	// After regenerating protos with `make bindings`, use: applicableIntents := req.GetApplicableIntents()
+	// For now, pass nil which means all intents are applicable.
+	var applicableIntents []pb.Intent
+
+	log.Printf("Processing request %s at lifecycle stage %v with applicable_intents=%v",
+		req.GetId(), lifecycle, applicableIntents)
 
 	// Run segment activation handler
-	if segmentMutations, err := a.handlers.ProcessSegments(ctx, bidRequest); err == nil {
+	if segmentMutations, err := a.handlers.ProcessSegments(ctx, bidRequest, applicableIntents); err == nil {
 		mutations = append(mutations, segmentMutations...)
 	} else {
 		log.Printf("Segment processing error: %v", err)
 	}
 
 	// Run deal activation handler
-	if dealMutations, err := a.handlers.ProcessDeals(ctx, bidRequest); err == nil {
+	if dealMutations, err := a.handlers.ProcessDeals(ctx, bidRequest, applicableIntents); err == nil {
 		mutations = append(mutations, dealMutations...)
 	} else {
 		log.Printf("Deal processing error: %v", err)
@@ -80,11 +87,18 @@ func (a *ARTFAgent) GetMutations(ctx context.Context, req *pb.RTBRequest) (*pb.R
 
 	// Run bid shading handler (if bid response is present)
 	if bidResponse != nil {
-		if bidMutations, err := a.handlers.ProcessBidShading(ctx, bidRequest, bidResponse); err == nil {
+		if bidMutations, err := a.handlers.ProcessBidShading(ctx, bidRequest, bidResponse, applicableIntents); err == nil {
 			mutations = append(mutations, bidMutations...)
 		} else {
 			log.Printf("Bid shading error: %v", err)
 		}
+	}
+
+	// Run content data handler for ADD_CIDS
+	if contentMutations, err := a.handlers.ProcessContentData(ctx, bidRequest, applicableIntents); err == nil {
+		mutations = append(mutations, contentMutations...)
+	} else {
+		log.Printf("Content data processing error: %v", err)
 	}
 
 	// Build response

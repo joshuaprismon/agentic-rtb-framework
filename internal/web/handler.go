@@ -75,8 +75,11 @@ func (h *Handler) loadDefaultSamples() {
 		Name:        "Basic Banner Request",
 		Description: "A simple banner ad request with user demographics",
 		Payload: map[string]interface{}{
-			"id":   "sample-banner-001",
-			"tmax": 100,
+			"id":                 "sample-banner-001",
+			"tmax":               100,
+			"lifecycle":          "LIFECYCLE_PUBLISHER_BID_REQUEST",
+			"originator":         map[string]interface{}{"type": "TYPE_SSP", "id": "ssp-example-001"},
+			"applicable_intents": []string{"ACTIVATE_SEGMENTS", "ACTIVATE_DEALS"},
 			"bid_request": map[string]interface{}{
 				"id": "auction-123",
 				"imp": []interface{}{
@@ -130,8 +133,11 @@ func (h *Handler) loadDefaultSamples() {
 		Name:        "Video Request with Deals",
 		Description: "A video ad request with private marketplace deals",
 		Payload: map[string]interface{}{
-			"id":   "sample-video-001",
-			"tmax": 150,
+			"id":                 "sample-video-001",
+			"tmax":               150,
+			"lifecycle":          "LIFECYCLE_PUBLISHER_BID_REQUEST",
+			"originator":         map[string]interface{}{"type": "TYPE_EXCHANGE", "id": "exchange-video-001"},
+			"applicable_intents": []string{"ACTIVATE_SEGMENTS", "ACTIVATE_DEALS", "ADJUST_DEAL_FLOOR"},
 			"bid_request": map[string]interface{}{
 				"id": "auction-456",
 				"imp": []interface{}{
@@ -146,7 +152,7 @@ func (h *Handler) loadDefaultSamples() {
 						},
 						"bidfloor": 8.00,
 						"pmp": map[string]interface{}{
-							"private_auction": 1,
+							"private_auction": true,
 							"deals": []interface{}{
 								map[string]interface{}{
 									"id":       "deal-premium-video",
@@ -174,8 +180,11 @@ func (h *Handler) loadDefaultSamples() {
 		Name:        "Bid Response with Shading",
 		Description: "A complete request/response pair for bid shading demonstration",
 		Payload: map[string]interface{}{
-			"id":   "sample-bidshade-001",
-			"tmax": 100,
+			"id":                 "sample-bidshade-001",
+			"tmax":               100,
+			"lifecycle":          "LIFECYCLE_DSP_BID_RESPONSE",
+			"originator":         map[string]interface{}{"type": "TYPE_DSP", "id": "dsp-bidshade-001"},
+			"applicable_intents": []string{"BID_SHADE"},
 			"bid_request": map[string]interface{}{
 				"id": "auction-789",
 				"imp": []interface{}{
@@ -216,8 +225,11 @@ func (h *Handler) loadDefaultSamples() {
 		Name:        "Native Ad Request",
 		Description: "A native advertising request",
 		Payload: map[string]interface{}{
-			"id":   "sample-native-001",
-			"tmax": 100,
+			"id":                 "sample-native-001",
+			"tmax":               100,
+			"lifecycle":          "LIFECYCLE_PUBLISHER_BID_REQUEST",
+			"originator":         map[string]interface{}{"type": "TYPE_SSP", "id": "ssp-mobile-001"},
+			"applicable_intents": []string{"ACTIVATE_SEGMENTS", "ACTIVATE_DEALS"},
 			"bid_request": map[string]interface{}{
 				"id": "auction-native-123",
 				"imp": []interface{}{
@@ -254,8 +266,11 @@ func (h *Handler) loadDefaultSamples() {
 		Name:        "Multi-Impression Request",
 		Description: "A request with multiple impression opportunities",
 		Payload: map[string]interface{}{
-			"id":   "sample-multi-001",
-			"tmax": 120,
+			"id":                 "sample-multi-001",
+			"tmax":               120,
+			"lifecycle":          "LIFECYCLE_PUBLISHER_BID_REQUEST",
+			"originator":         map[string]interface{}{"type": "TYPE_PUBLISHER", "id": "pub-news-001"},
+			"applicable_intents": []string{"ACTIVATE_SEGMENTS", "ACTIVATE_DEALS", "ADJUST_DEAL_FLOOR"},
 			"bid_request": map[string]interface{}{
 				"id": "auction-multi-123",
 				"imp": []interface{}{

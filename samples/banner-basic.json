@@ -1,6 +1,12 @@
 {
   "id": "sample-banner-001",
   "tmax": 100,
+  "lifecycle": "LIFECYCLE_PUBLISHER_BID_REQUEST",
+  "originator": {
+    "type": "TYPE_SSP",
+    "id": "ssp-example-001"
+  },
+  "applicable_intents": ["ACTIVATE_SEGMENTS", "ACTIVATE_DEALS"],
   "bid_request": {
     "id": "auction-123",
     "imp": [

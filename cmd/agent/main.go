@@ -91,6 +91,10 @@ func main() {
 	healthChecker := health.NewChecker()
 	mutationHandlers := handlers.NewMutationHandlers()
 
+	// Create the ARTF agent (shared by both gRPC and MCP interfaces)
+	// This ensures a single implementation for all business logic
+	artfAgent := agent.NewARTFAgent(mutationHandlers)
+
 	// Track services for shutdown
 	var grpcServer *grpc.Server
 	var mcpAgent *mcp.Agent
@@ -103,7 +107,6 @@ func main() {
 			grpc.UnaryInterceptor(agent.LoggingInterceptor),
 		)
 
-		artfAgent := agent.NewARTFAgent(mutationHandlers)
 		agent.RegisterRTBExtensionPointServer(grpcServer, artfAgent)
 		reflection.Register(grpcServer)
 
@@ -124,8 +127,8 @@ func main() {
 	// When both Web and MCP are enabled, serve them on the same port (web port)
 	// This allows an external load balancer to route to a single endpoint
 	if *enableWeb && *enableMCP {
-		// Create MCP agent
-		mcpAgent = mcp.NewAgent(mutationHandlers, *listenAddr, *webPort)
+		// Create MCP agent that wraps the gRPC agent (single implementation)
+		mcpAgent = mcp.NewAgent(artfAgent, *listenAddr, *webPort)
 
 		// MCP endpoint is relative when served on same port
 		mcpEndpoint := buildMCPEndpoint()
@@ -158,7 +161,8 @@ func main() {
 	} else {
 		// Start MCP interface standalone
 		if *enableMCP {
-			mcpAgent = mcp.NewAgent(mutationHandlers, *listenAddr, *mcpPort)
+			// MCP agent wraps the gRPC agent (single implementation)
+			mcpAgent = mcp.NewAgent(artfAgent, *listenAddr, *mcpPort)
 			mcpListenAddr := fmt.Sprintf("%s:%d", *listenAddr, *mcpPort)
 
 			go func() {

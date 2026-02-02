@@ -1,6 +1,12 @@
 {
   "id": "sample-multi-001",
   "tmax": 120,
+  "lifecycle": "LIFECYCLE_PUBLISHER_BID_REQUEST",
+  "originator": {
+    "type": "TYPE_PUBLISHER",
+    "id": "pub-news-001"
+  },
+  "applicable_intents": ["ACTIVATE_SEGMENTS", "ACTIVATE_DEALS", "ADJUST_DEAL_FLOOR", "ADD_CIDS"],
   "bid_request": {
     "id": "auction-multi-123",
     "imp": [

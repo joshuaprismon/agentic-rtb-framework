@@ -1,6 +1,12 @@
 {
   "id": "sample-video-001",
   "tmax": 150,
+  "lifecycle": "LIFECYCLE_PUBLISHER_BID_REQUEST",
+  "originator": {
+    "type": "TYPE_EXCHANGE",
+    "id": "exchange-video-001"
+  },
+  "applicable_intents": ["ACTIVATE_SEGMENTS", "ACTIVATE_DEALS", "ADJUST_DEAL_FLOOR"],
   "bid_request": {
     "id": "auction-456",
     "imp": [
@@ -19,7 +25,7 @@
         "bidfloor": 8.00,
         "bidfloorcur": "USD",
         "pmp": {
-          "private_auction": 1,
+          "private_auction": true,
           "deals": [
             {
               "id": "deal-premium-video",
@@ -47,7 +53,7 @@
         "id": "content-12345",
         "title": "Example Video Content",
         "cat": ["IAB1-6"],
-        "livestream": 0,
+        "livestream": false,
         "len": 3600
       }
     },
@@ -77,8 +83,8 @@
       }
     },
     "regs": {
-      "coppa": 0,
-      "gdpr": 0
+      "coppa": false,
+      "gdpr": false
     }
   }
 }

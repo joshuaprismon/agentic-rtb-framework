@@ -15,7 +15,9 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-// Package mcp implements the MCP interface for ARTF
+// Package mcp implements the MCP interface for ARTF.
+// This package provides an MCP (Model Context Protocol) wrapper around the gRPC
+// RTBExtensionPoint service, allowing AI agents to interact with ARTF via MCP tools.
 package mcp
 
 import (
@@ -26,51 +28,25 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/iabtechlab/agentic-rtb-framework/internal/handlers"
+	"github.com/iabtechlab/agentic-rtb-framework/internal/agent"
+	pb "github.com/iabtechlab/agentic-rtb-framework/pkg/pb/artf"
+	openrtb "github.com/iabtechlab/agentic-rtb-framework/pkg/pb/openrtb"
 	"github.com/mark3labs/mcp-go/mcp"
 	"github.com/mark3labs/mcp-go/server"
+	"google.golang.org/protobuf/encoding/protojson"
 )
 
-// Agent wraps the MCP server with ARTF-specific functionality
+// Agent wraps the MCP server with ARTF-specific functionality.
+// It delegates all business logic to the underlying gRPC ARTFAgent.
 type Agent struct {
-	mcpServer *server.MCPServer
-	handlers  *handlers.MutationHandlers
-	addr      string
-	port      int
+	mcpServer  *server.MCPServer
+	grpcAgent  *agent.ARTFAgent
+	addr       string
+	port       int
 }
 
-// RTBRequest represents the MCP tool input for extend_rtb
-type RTBRequest struct {
-	Lifecycle   string                 `json:"lifecycle,omitempty"`
-	ID          string                 `json:"id"`
-	Tmax        int                    `json:"tmax,omitempty"`
-	BidRequest  map[string]interface{} `json:"bid_request"`
-	BidResponse map[string]interface{} `json:"bid_response,omitempty"`
-}
-
-// RTBResponse represents the MCP tool output
-type RTBResponse struct {
-	ID        string     `json:"id"`
-	Mutations []Mutation `json:"mutations"`
-	Metadata  Metadata   `json:"metadata"`
-}
-
-// Mutation represents a single mutation in the response
-type Mutation struct {
-	Intent string                 `json:"intent"`
-	Op     string                 `json:"op"`
-	Path   string                 `json:"path"`
-	Value  map[string]interface{} `json:"value,omitempty"`
-}
-
-// Metadata contains response metadata
-type Metadata struct {
-	APIVersion   string `json:"api_version"`
-	ModelVersion string `json:"model_version"`
-}
-
-// NewAgent creates a new MCP agent instance
-func NewAgent(h *handlers.MutationHandlers, addr string, port int) *Agent {
+// NewAgent creates a new MCP agent instance that wraps the gRPC agent
+func NewAgent(grpcAgent *agent.ARTFAgent, addr string, port int) *Agent {
 	// Create MCP server
 	mcpServer := server.NewMCPServer(
 		"ARTF Agent",
@@ -80,10 +56,10 @@ func NewAgent(h *handlers.MutationHandlers, addr string, port int) *Agent {
 	)
 
 	a := &Agent{
-		mcpServer: mcpServer,
-		handlers:  h,
-		addr:      addr,
-		port:      port,
+		mcpServer:  mcpServer,
+		grpcAgent:  grpcAgent,
+		addr:       addr,
+		port:       port,
 	}
 
 	// Register the extend_rtb tool
@@ -94,25 +70,36 @@ func NewAgent(h *handlers.MutationHandlers, addr string, port int) *Agent {
 
 // registerTools registers the ARTF tools with the MCP server
 func (a *Agent) registerTools() {
-	// Define the extend_rtb tool
+	// Define the extend_rtb tool with full ARTF protocol support
 	extendRTBTool := mcp.NewTool("extend_rtb",
-		mcp.WithDescription("Process an OpenRTB bid request/response and return proposed mutations for segment activation, deal management, bid shading, and metrics"),
+		mcp.WithDescription("Process an OpenRTB bid request/response and return proposed mutations. "+
+			"Supports intents: ACTIVATE_SEGMENTS, ACTIVATE_DEALS, SUPPRESS_DEALS, ADJUST_DEAL_FLOOR, "+
+			"ADJUST_DEAL_MARGIN, BID_SHADE, ADD_METRICS, ADD_CIDS. "+
+			"Use applicable_intents to filter which mutation types you want returned."),
 		mcp.WithString("id",
 			mcp.Required(),
-			mcp.Description("Unique request ID"),
+			mcp.Description("Unique request ID assigned by the exchange"),
 		),
 		mcp.WithNumber("tmax",
-			mcp.Description("Maximum response time in milliseconds"),
+			mcp.Description("Maximum response time in milliseconds the exchange allows for mutations"),
 		),
 		mcp.WithObject("bid_request",
 			mcp.Required(),
 			mcp.Description("OpenRTB v2.6 BidRequest object"),
 		),
 		mcp.WithObject("bid_response",
-			mcp.Description("OpenRTB v2.6 BidResponse object (optional)"),
+			mcp.Description("OpenRTB v2.6 BidResponse object (required for BID_SHADE intent)"),
 		),
 		mcp.WithString("lifecycle",
-			mcp.Description("Auction lifecycle stage"),
+			mcp.Description("Auction lifecycle stage: LIFECYCLE_PUBLISHER_BID_REQUEST or LIFECYCLE_DSP_BID_RESPONSE"),
+		),
+		mcp.WithObject("originator",
+			mcp.Description("Business entity that created the BidRequest/BidResponse. Object with 'type' (TYPE_PUBLISHER, TYPE_SSP, TYPE_EXCHANGE, TYPE_DSP) and 'id' fields"),
+		),
+		mcp.WithArray("applicable_intents",
+			mcp.Description("List of intents the agent is eligible to return. If omitted, all intents are applicable. "+
+				"Valid values: ACTIVATE_SEGMENTS, ACTIVATE_DEALS, SUPPRESS_DEALS, ADJUST_DEAL_FLOOR, "+
+				"ADJUST_DEAL_MARGIN, BID_SHADE, ADD_METRICS, ADD_CIDS"),
 		),
 	)
 
@@ -120,7 +107,7 @@ func (a *Agent) registerTools() {
 	a.mcpServer.AddTool(extendRTBTool, a.handleExtendRTB)
 }
 
-// handleExtendRTB processes the extend_rtb tool call
+// handleExtendRTB processes the extend_rtb tool call by delegating to the gRPC agent
 func (a *Agent) handleExtendRTB(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 	startTime := time.Now()
 
@@ -131,9 +118,9 @@ func (a *Agent) handleExtendRTB(ctx context.Context, request mcp.CallToolRequest
 	}
 
 	// Get optional tmax
-	tmax := 100 // default
+	tmax := int32(100) // default
 	if tmaxVal, err := request.RequireFloat("tmax"); err == nil {
-		tmax = int(tmaxVal)
+		tmax = int32(tmaxVal)
 	}
 
 	// Get bid_request
@@ -149,227 +136,140 @@ func (a *Agent) handleExtendRTB(ctx context.Context, request mcp.CallToolRequest
 		bidResponseRaw = br
 	}
 
-	log.Printf("MCP: Processing extend_rtb request %s with tmax=%d", id, tmax)
+	// Get optional lifecycle (NOTE: Full lifecycle enum requires proto regeneration)
+	var lifecycleStr string
+	if lc, ok := args["lifecycle"].(string); ok && lc != "" {
+		lifecycleStr = lc
+	}
+	lifecycle := pb.Lifecycle_LIFECYCLE_UNSPECIFIED
 
-	// Process the request using handlers
-	response, err := a.processRequest(ctx, id, tmax, bidRequestRaw, bidResponseRaw)
+	// Get optional originator (NOTE: Originator type requires proto regeneration)
+	var originatorStr string
+	if orig, ok := args["originator"].(map[string]interface{}); ok {
+		if t, ok := orig["type"].(string); ok {
+			originatorStr = t
+		}
+	}
+
+	// Get optional applicable_intents
+	var applicableIntentStrs []string
+	if intentsRaw, ok := args["applicable_intents"].([]interface{}); ok {
+		for _, intentRaw := range intentsRaw {
+			if intentStr, ok := intentRaw.(string); ok {
+				applicableIntentStrs = append(applicableIntentStrs, intentStr)
+			}
+		}
+	}
+
+	log.Printf("MCP: Processing extend_rtb request %s with tmax=%d, lifecycle=%s, originator=%s, applicable_intents=%v",
+		id, tmax, lifecycleStr, originatorStr, applicableIntentStrs)
+
+	// Convert JSON to protobuf
+	bidRequest, err := jsonToOpenRTBBidRequest(bidRequestRaw)
 	if err != nil {
-		log.Printf("MCP: Error processing request: %v", err)
+		return mcp.NewToolResultError(fmt.Sprintf("failed to parse bid_request: %v", err)), nil
+	}
+
+	var bidResponse *openrtb.BidResponse
+	if bidResponseRaw != nil {
+		bidResponse, err = jsonToOpenRTBBidResponse(bidResponseRaw)
+		if err != nil {
+			return mcp.NewToolResultError(fmt.Sprintf("failed to parse bid_response: %v", err)), nil
+		}
+	}
+
+	// Build the gRPC request
+	// NOTE: applicable_intents, originator, and full lifecycle enum require proto regeneration.
+	grpcRequest := &pb.RTBRequest{
+		Id:          &id,
+		Tmax:        &tmax,
+		Lifecycle:   lifecycle.Enum(),
+		BidRequest:  bidRequest,
+		BidResponse: bidResponse,
+	}
+
+	// Call the gRPC agent directly (no network hop)
+	grpcResponse, err := a.grpcAgent.GetMutations(ctx, grpcRequest)
+	if err != nil {
+		log.Printf("MCP: Error from gRPC agent: %v", err)
 		return mcp.NewToolResultError(fmt.Sprintf("processing error: %v", err)), nil
 	}
 
-	// Serialize response to JSON
-	responseJSON, err := json.Marshal(response)
+	// Convert protobuf response to JSON
+	jsonResponse, err := protoResponseToJSON(grpcResponse)
 	if err != nil {
 		return mcp.NewToolResultError(fmt.Sprintf("serialization error: %v", err)), nil
 	}
 
 	log.Printf("MCP: Request %s processed in %v, returning %d mutations",
-		id, time.Since(startTime), len(response.Mutations))
+		id, time.Since(startTime), len(grpcResponse.GetMutations()))
 
-	return mcp.NewToolResultText(string(responseJSON)), nil
+	return mcp.NewToolResultText(string(jsonResponse)), nil
 }
 
-// processRequest processes the RTB request and generates mutations
-func (a *Agent) processRequest(ctx context.Context, id string, tmax int, bidRequest, bidResponse map[string]interface{}) (*RTBResponse, error) {
-	var mutations []Mutation
-
-	// Extract user data for segment activation
-	if user, ok := bidRequest["user"].(map[string]interface{}); ok {
-		segments := a.determineUserSegments(user)
-		if len(segments) > 0 {
-			mutations = append(mutations, Mutation{
-				Intent: "ACTIVATE_SEGMENTS",
-				Op:     "OPERATION_ADD",
-				Path:   "/user/data/segment",
-				Value: map[string]interface{}{
-					"ids": map[string]interface{}{
-						"id": segments,
-					},
-				},
-			})
-		}
-	}
-
-	// Process impressions for deal activation
-	if imps, ok := bidRequest["imp"].([]interface{}); ok {
-		for _, impRaw := range imps {
-			if imp, ok := impRaw.(map[string]interface{}); ok {
-				impID, _ := imp["id"].(string)
-				deals := a.determineDealActivations(imp)
-				if len(deals) > 0 {
-					mutations = append(mutations, Mutation{
-						Intent: "ACTIVATE_DEALS",
-						Op:     "OPERATION_ADD",
-						Path:   "/imp/" + impID,
-						Value: map[string]interface{}{
-							"ids": map[string]interface{}{
-								"id": deals,
-							},
-						},
-					})
-				}
-			}
-		}
-	}
-
-	// Process bid response for bid shading
-	if bidResponse != nil {
-		if seatbids, ok := bidResponse["seatbid"].([]interface{}); ok {
-			for _, seatbidRaw := range seatbids {
-				if seatbid, ok := seatbidRaw.(map[string]interface{}); ok {
-					seat, _ := seatbid["seat"].(string)
-					if bids, ok := seatbid["bid"].([]interface{}); ok {
-						for _, bidRaw := range bids {
-							if bid, ok := bidRaw.(map[string]interface{}); ok {
-								bidID, _ := bid["id"].(string)
-								price, _ := bid["price"].(float64)
-								impID, _ := bid["impid"].(string)
-
-								shadedPrice := a.calculateShadedPrice(bidRequest, impID, price)
-								if shadedPrice != nil && *shadedPrice != price {
-									mutations = append(mutations, Mutation{
-										Intent: "BID_SHADE",
-										Op:     "OPERATION_REPLACE",
-										Path:   fmt.Sprintf("/seatbid/%s/bid/%s", seat, bidID),
-										Value: map[string]interface{}{
-											"adjust_bid": map[string]interface{}{
-												"price": *shadedPrice,
-											},
-										},
-									})
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-
-	return &RTBResponse{
-		ID:        id,
-		Mutations: mutations,
-		Metadata: Metadata{
-			APIVersion:   "1.0",
-			ModelVersion: "v0.10.0",
-		},
-	}, nil
-}
-
-// determineUserSegments analyzes user data and returns applicable segment IDs
-func (a *Agent) determineUserSegments(user map[string]interface{}) []string {
-	var segments []string
-
-	// Re-activate existing segments from user.data
-	if data, ok := user["data"].([]interface{}); ok {
-		for _, dataRaw := range data {
-			if dataObj, ok := dataRaw.(map[string]interface{}); ok {
-				if segs, ok := dataObj["segment"].([]interface{}); ok {
-					for _, segRaw := range segs {
-						if seg, ok := segRaw.(map[string]interface{}); ok {
-							if id, ok := seg["id"].(string); ok && id != "" {
-								segments = append(segments, id)
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-
-	// Add demographic segments based on year of birth
-	if yob, ok := user["yob"].(float64); ok && yob > 0 {
-		age := 2024 - int(yob)
-		switch {
-		case age >= 18 && age <= 24:
-			segments = append(segments, "demo-18-24")
-		case age >= 25 && age <= 34:
-			segments = append(segments, "demo-25-34")
-		case age >= 35 && age <= 44:
-			segments = append(segments, "demo-35-44")
-		case age >= 45:
-			segments = append(segments, "demo-45-plus")
-		}
-	}
-
-	// Add gender segment
-	if gender, ok := user["gender"].(string); ok {
-		switch gender {
-		case "M":
-			segments = append(segments, "gender-male")
-		case "F":
-			segments = append(segments, "gender-female")
-		}
-	}
-
-	return segments
-}
-
-// determineDealActivations returns deal IDs to activate for an impression
-func (a *Agent) determineDealActivations(imp map[string]interface{}) []string {
-	var deals []string
-
-	// Check bidfloor for premium deal activation
-	if bidfloor, ok := imp["bidfloor"].(float64); ok && bidfloor >= 5.0 {
-		deals = append(deals, "premium-deal-001")
-	}
-
-	// Check for video impression
-	if _, ok := imp["video"]; ok {
-		deals = append(deals, "video-deal-001")
-	}
-
-	// Check for native impression
-	if _, ok := imp["native"]; ok {
-		deals = append(deals, "native-deal-001")
-	}
-
-	// Check for banner impression
-	if _, ok := imp["banner"]; ok {
-		deals = append(deals, "display-deal-001")
-	}
-
-	return deals
-}
-
-// calculateShadedPrice calculates the optimal shaded bid price
-func (a *Agent) calculateShadedPrice(bidRequest map[string]interface{}, impID string, originalPrice float64) *float64 {
-	if originalPrice <= 0 {
-		return nil
-	}
-
-	// Find the impression to get bidfloor
-	var bidfloor float64
-	if imps, ok := bidRequest["imp"].([]interface{}); ok {
-		for _, impRaw := range imps {
-			if imp, ok := impRaw.(map[string]interface{}); ok {
-				if id, _ := imp["id"].(string); id == impID {
-					bidfloor, _ = imp["bidfloor"].(float64)
-					break
-				}
-			}
-		}
-	}
-
-	if bidfloor <= 0 {
-		return nil
-	}
-
-	// Calculate shade percentage based on margin above floor
-	var shadePercent float64
-	margin := originalPrice - bidfloor
-	switch {
-	case margin > bidfloor*0.5:
-		shadePercent = 0.15 // 15% shade
-	case margin > bidfloor*0.2:
-		shadePercent = 0.10 // 10% shade
+// parseIntent converts a string to pb.Intent
+// NOTE: After proto regeneration, add parseLifecycle, parseOriginatorType functions
+// and ADD_CIDS case to this switch
+func parseIntent(s string) pb.Intent {
+	switch s {
+	case "ACTIVATE_SEGMENTS":
+		return pb.Intent_ACTIVATE_SEGMENTS
+	case "ACTIVATE_DEALS":
+		return pb.Intent_ACTIVATE_DEALS
+	case "SUPPRESS_DEALS":
+		return pb.Intent_SUPPRESS_DEALS
+	case "ADJUST_DEAL_FLOOR":
+		return pb.Intent_ADJUST_DEAL_FLOOR
+	case "ADJUST_DEAL_MARGIN":
+		return pb.Intent_ADJUST_DEAL_MARGIN
+	case "BID_SHADE":
+		return pb.Intent_BID_SHADE
+	case "ADD_METRICS":
+		return pb.Intent_ADD_METRICS
+	// case "ADD_CIDS": return pb.Intent_ADD_CIDS // Requires proto regeneration
 	default:
-		shadePercent = 0.05 // 5% shade
+		return pb.Intent_INTENT_UNSPECIFIED
+	}
+}
+
+// jsonToOpenRTBBidRequest converts JSON map to OpenRTB BidRequest protobuf
+func jsonToOpenRTBBidRequest(data map[string]interface{}) (*openrtb.BidRequest, error) {
+	jsonBytes, err := json.Marshal(data)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal JSON: %w", err)
 	}
 
-	shadedPrice := originalPrice * (1 - shadePercent)
-	return &shadedPrice
+	req := &openrtb.BidRequest{}
+	if err := protojson.Unmarshal(jsonBytes, req); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal to protobuf: %w", err)
+	}
+
+	return req, nil
+}
+
+// jsonToOpenRTBBidResponse converts JSON map to OpenRTB BidResponse protobuf
+func jsonToOpenRTBBidResponse(data map[string]interface{}) (*openrtb.BidResponse, error) {
+	jsonBytes, err := json.Marshal(data)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal JSON: %w", err)
+	}
+
+	resp := &openrtb.BidResponse{}
+	if err := protojson.Unmarshal(jsonBytes, resp); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal to protobuf: %w", err)
+	}
+
+	return resp, nil
+}
+
+// protoResponseToJSON converts the gRPC response to JSON for MCP
+func protoResponseToJSON(resp *pb.RTBResponse) ([]byte, error) {
+	// Use protojson for proper JSON serialization
+	opts := protojson.MarshalOptions{
+		UseProtoNames:   true,
+		EmitUnpopulated: false,
+	}
+	return opts.Marshal(resp)
 }
 
 // corsMiddleware wraps an http.Handler with CORS headers

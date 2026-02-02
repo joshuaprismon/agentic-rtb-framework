@@ -1,6 +1,12 @@
 {
   "id": "sample-bidshade-001",
   "tmax": 100,
+  "lifecycle": "LIFECYCLE_DSP_BID_RESPONSE",
+  "originator": {
+    "type": "TYPE_DSP",
+    "id": "dsp-bidshade-001"
+  },
+  "applicable_intents": ["BID_SHADE"],
   "bid_request": {
     "id": "auction-789",
     "imp": [

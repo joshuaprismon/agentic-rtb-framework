@@ -36,9 +36,29 @@ func NewMutationHandlers() *MutationHandlers {
 	return &MutationHandlers{}
 }
 
-// ProcessSegments analyzes the bid request and returns segment activation mutations
-func (h *MutationHandlers) ProcessSegments(ctx context.Context, req *openrtb.BidRequest) ([]*pb.Mutation, error) {
+// IsIntentApplicable checks if an intent is in the applicable intents list.
+// If applicableIntents is nil or empty, all intents are applicable.
+func IsIntentApplicable(intent pb.Intent, applicableIntents []pb.Intent) bool {
+	if len(applicableIntents) == 0 {
+		return true
+	}
+	for _, ai := range applicableIntents {
+		if ai == intent {
+			return true
+		}
+	}
+	return false
+}
+
+// ProcessSegments analyzes the bid request and returns segment activation mutations.
+// Respects applicableIntents filtering - if empty, all intents are applicable.
+func (h *MutationHandlers) ProcessSegments(ctx context.Context, req *openrtb.BidRequest, applicableIntents []pb.Intent) ([]*pb.Mutation, error) {
 	if req == nil {
+		return nil, nil
+	}
+
+	// Check if ACTIVATE_SEGMENTS intent is applicable
+	if !IsIntentApplicable(pb.Intent_ACTIVATE_SEGMENTS, applicableIntents) {
 		return nil, nil
 	}
 
@@ -69,55 +89,69 @@ func (h *MutationHandlers) ProcessSegments(ctx context.Context, req *openrtb.Bid
 	return mutations, nil
 }
 
-// ProcessDeals analyzes the bid request and returns deal-related mutations
-func (h *MutationHandlers) ProcessDeals(ctx context.Context, req *openrtb.BidRequest) ([]*pb.Mutation, error) {
+// ProcessDeals analyzes the bid request and returns deal-related mutations.
+// Respects applicableIntents filtering for ACTIVATE_DEALS, SUPPRESS_DEALS, and ADJUST_DEAL_FLOOR.
+func (h *MutationHandlers) ProcessDeals(ctx context.Context, req *openrtb.BidRequest, applicableIntents []pb.Intent) ([]*pb.Mutation, error) {
 	if req == nil {
 		return nil, nil
 	}
 
 	var mutations []*pb.Mutation
 
+	activateDealsApplicable := IsIntentApplicable(pb.Intent_ACTIVATE_DEALS, applicableIntents)
+	adjustFloorApplicable := IsIntentApplicable(pb.Intent_ADJUST_DEAL_FLOOR, applicableIntents)
+
 	// Process each impression
 	for _, imp := range req.GetImp() {
 		impID := imp.GetId()
 
 		// Example: Activate deals based on impression characteristics
-		dealsToActivate := determineDealActivations(imp)
-		if len(dealsToActivate) > 0 {
-			mutation := &pb.Mutation{
-				Intent: pb.Intent_ACTIVATE_DEALS.Enum(),
-				Op:     pb.Operation_OPERATION_ADD.Enum(),
-				Path:   stringPtr("/imp/" + impID),
-				Value: &pb.Mutation_Ids{
-					Ids: &pb.IDsPayload{
-						Id: dealsToActivate,
+		if activateDealsApplicable {
+			dealsToActivate := determineDealActivations(imp)
+			if len(dealsToActivate) > 0 {
+				mutation := &pb.Mutation{
+					Intent: pb.Intent_ACTIVATE_DEALS.Enum(),
+					Op:     pb.Operation_OPERATION_ADD.Enum(),
+					Path:   stringPtr("/imp/" + impID),
+					Value: &pb.Mutation_Ids{
+						Ids: &pb.IDsPayload{
+							Id: dealsToActivate,
+						},
 					},
-				},
+				}
+				mutations = append(mutations, mutation)
+				log.Printf("Activating %d deals for impression %s", len(dealsToActivate), impID)
 			}
-			mutations = append(mutations, mutation)
-			log.Printf("Activating %d deals for impression %s", len(dealsToActivate), impID)
 		}
 
 		// Example: Adjust deal floors
-		if floorAdjustment := calculateDealFloorAdjustment(imp); floorAdjustment != nil {
-			mutation := &pb.Mutation{
-				Intent: pb.Intent_ADJUST_DEAL_FLOOR.Enum(),
-				Op:     pb.Operation_OPERATION_REPLACE.Enum(),
-				Path:   stringPtr("/imp/" + impID + "/pmp/deals"),
-				Value: &pb.Mutation_AdjustDeal{
-					AdjustDeal: floorAdjustment,
-				},
+		if adjustFloorApplicable {
+			if floorAdjustment := calculateDealFloorAdjustment(imp); floorAdjustment != nil {
+				mutation := &pb.Mutation{
+					Intent: pb.Intent_ADJUST_DEAL_FLOOR.Enum(),
+					Op:     pb.Operation_OPERATION_REPLACE.Enum(),
+					Path:   stringPtr("/imp/" + impID + "/pmp/deals"),
+					Value: &pb.Mutation_AdjustDeal{
+						AdjustDeal: floorAdjustment,
+					},
+				}
+				mutations = append(mutations, mutation)
 			}
-			mutations = append(mutations, mutation)
 		}
 	}
 
 	return mutations, nil
 }
 
-// ProcessBidShading analyzes bid responses and returns bid adjustment mutations
-func (h *MutationHandlers) ProcessBidShading(ctx context.Context, req *openrtb.BidRequest, resp *openrtb.BidResponse) ([]*pb.Mutation, error) {
+// ProcessBidShading analyzes bid responses and returns bid adjustment mutations.
+// Respects applicableIntents filtering for BID_SHADE intent.
+func (h *MutationHandlers) ProcessBidShading(ctx context.Context, req *openrtb.BidRequest, resp *openrtb.BidResponse, applicableIntents []pb.Intent) ([]*pb.Mutation, error) {
 	if req == nil || resp == nil {
+		return nil, nil
+	}
+
+	// Check if BID_SHADE intent is applicable
+	if !IsIntentApplicable(pb.Intent_BID_SHADE, applicableIntents) {
 		return nil, nil
 	}
 
@@ -147,6 +181,17 @@ func (h *MutationHandlers) ProcessBidShading(ctx context.Context, req *openrtb.B
 	}
 
 	return mutations, nil
+}
+
+// ProcessContentData analyzes bid request and returns content ID mutations.
+// Respects applicableIntents filtering for ADD_CIDS intent.
+// NOTE: ADD_CIDS intent requires protobuf regeneration to be fully supported.
+// This is a placeholder that returns nil until protos are regenerated.
+func (h *MutationHandlers) ProcessContentData(ctx context.Context, req *openrtb.BidRequest, applicableIntents []pb.Intent) ([]*pb.Mutation, error) {
+	// ADD_CIDS (Intent 8) is defined in proto but not yet in generated Go code.
+	// After running `make bindings`, this can be fully implemented.
+	// For now, return nil to allow compilation.
+	return nil, nil
 }
 
 // determineUserSegments analyzes user data and returns applicable segment IDs
