@@ -1,0 +1,11 @@
+/Users/joewilson/Documents/Development/agentic-rtb-framework/rust/target/debug/deps/libquote-317c82e0c7641d70.rmeta: /Users/joewilson/.cargo/registry/src/index.crates.io-6f17d22bba15001f/quote-1.0.42/src/lib.rs /Users/joewilson/.cargo/registry/src/index.crates.io-6f17d22bba15001f/quote-1.0.42/src/ext.rs /Users/joewilson/.cargo/registry/src/index.crates.io-6f17d22bba15001f/quote-1.0.42/src/format.rs /Users/joewilson/.cargo/registry/src/index.crates.io-6f17d22bba15001f/quote-1.0.42/src/ident_fragment.rs /Users/joewilson/.cargo/registry/src/index.crates.io-6f17d22bba15001f/quote-1.0.42/src/to_tokens.rs /Users/joewilson/.cargo/registry/src/index.crates.io-6f17d22bba15001f/quote-1.0.42/src/runtime.rs /Users/joewilson/.cargo/registry/src/index.crates.io-6f17d22bba15001f/quote-1.0.42/src/spanned.rs
+
+/Users/joewilson/Documents/Development/agentic-rtb-framework/rust/target/debug/deps/quote-317c82e0c7641d70.d: /Users/joewilson/.cargo/registry/src/index.crates.io-6f17d22bba15001f/quote-1.0.42/src/lib.rs /Users/joewilson/.cargo/registry/src/index.crates.io-6f17d22bba15001f/quote-1.0.42/src/ext.rs /Users/joewilson/.cargo/registry/src/index.crates.io-6f17d22bba15001f/quote-1.0.42/src/format.rs /Users/joewilson/.cargo/registry/src/index.crates.io-6f17d22bba15001f/quote-1.0.42/src/ident_fragment.rs /Users/joewilson/.cargo/registry/src/index.crates.io-6f17d22bba15001f/quote-1.0.42/src/to_tokens.rs /Users/joewilson/.cargo/registry/src/index.crates.io-6f17d22bba15001f/quote-1.0.42/src/runtime.rs /Users/joewilson/.cargo/registry/src/index.crates.io-6f17d22bba15001f/quote-1.0.42/src/spanned.rs
+
+/Users/joewilson/.cargo/registry/src/index.crates.io-6f17d22bba15001f/quote-1.0.42/src/lib.rs:
+/Users/joewilson/.cargo/registry/src/index.crates.io-6f17d22bba15001f/quote-1.0.42/src/ext.rs:
+/Users/joewilson/.cargo/registry/src/index.crates.io-6f17d22bba15001f/quote-1.0.42/src/format.rs:
+/Users/joewilson/.cargo/registry/src/index.crates.io-6f17d22bba15001f/quote-1.0.42/src/ident_fragment.rs:
+/Users/joewilson/.cargo/registry/src/index.crates.io-6f17d22bba15001f/quote-1.0.42/src/to_tokens.rs:
+/Users/joewilson/.cargo/registry/src/index.crates.io-6f17d22bba15001f/quote-1.0.42/src/runtime.rs:
+/Users/joewilson/.cargo/registry/src/index.crates.io-6f17d22bba15001f/quote-1.0.42/src/spanned.rs:
