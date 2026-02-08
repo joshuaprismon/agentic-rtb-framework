@@ -1,0 +1,60 @@
+{
+  "id": "sample-bidshade-001",
+  "tmax": 100,
+  "lifecycle": "LIFECYCLE_DSP_BID_RESPONSE",
+  "originator": {
+    "type": "TYPE_DSP",
+    "id": "dsp-bidshade-001"
+  },
+  "applicable_intents": ["BID_SHADE"],
+  "bid_request": {
+    "id": "auction-789",
+    "imp": [
+      {
+        "id": "imp-1",
+        "banner": {
+          "w": 728,
+          "h": 90,
+          "pos": 1
+        },
+        "bidfloor": 2.00,
+        "bidfloorcur": "USD"
+      }
+    ],
+    "site": {
+      "id": "site-leaderboard",
+      "domain": "news.example.com",
+      "cat": ["IAB12"],
+      "page": "https://news.example.com/breaking-story"
+    },
+    "user": {
+      "id": "user-123",
+      "yob": 1975,
+      "gender": "M"
+    },
+    "device": {
+      "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
+      "ip": "10.0.0.50"
+    }
+  },
+  "bid_response": {
+    "id": "auction-789",
+    "cur": "USD",
+    "seatbid": [
+      {
+        "seat": "dsp-001",
+        "bid": [
+          {
+            "id": "bid-abc",
+            "impid": "imp-1",
+            "price": 5.50,
+            "adomain": ["advertiser.com"],
+            "crid": "creative-12345",
+            "w": 728,
+            "h": 90
+          }
+        ]
+      }
+    ]
+  }
+}

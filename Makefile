@@ -1,6 +1,30 @@
-# Build the docs for the proto3 definition.
+# Agentic RTB Framework Makefile
 
+BINARY=artf-agent
 LANGUAGES=go # cpp go csharp objc python ruby js
+
+# Go build and run targets
+.PHONY: build run-all run-grpc run-mcp run-web test
+
+build:
+	go build -o $(BINARY) ./cmd/agent
+
+run-all: build
+	./$(BINARY) --enable-grpc --enable-mcp --enable-web
+
+run-grpc: build
+	./$(BINARY) --enable-grpc
+
+run-mcp: build
+	./$(BINARY) --enable-mcp
+
+run-web: build
+	./$(BINARY) --enable-mcp --enable-web
+
+test:
+	go test ./...
+
+# Protobuf targets
 
 bindings:
 	for x in ${LANGUAGES}; do \

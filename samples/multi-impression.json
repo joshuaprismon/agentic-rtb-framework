@@ -1,0 +1,136 @@
+{
+  "id": "sample-multi-001",
+  "tmax": 120,
+  "lifecycle": "LIFECYCLE_PUBLISHER_BID_REQUEST",
+  "originator": {
+    "type": "TYPE_PUBLISHER",
+    "id": "pub-news-001"
+  },
+  "applicable_intents": ["ACTIVATE_SEGMENTS", "ACTIVATE_DEALS", "ADJUST_DEAL_FLOOR", "ADD_CIDS"],
+  "bid_request": {
+    "id": "auction-multi-123",
+    "imp": [
+      {
+        "id": "imp-header",
+        "banner": {
+          "w": 970,
+          "h": 250,
+          "pos": 1,
+          "format": [
+            {"w": 970, "h": 250},
+            {"w": 970, "h": 90},
+            {"w": 728, "h": 90}
+          ]
+        },
+        "bidfloor": 4.00,
+        "bidfloorcur": "USD",
+        "tagid": "header-billboard"
+      },
+      {
+        "id": "imp-sidebar",
+        "banner": {
+          "w": 300,
+          "h": 600,
+          "pos": 4,
+          "format": [
+            {"w": 300, "h": 600},
+            {"w": 300, "h": 250},
+            {"w": 160, "h": 600}
+          ]
+        },
+        "bidfloor": 2.50,
+        "bidfloorcur": "USD",
+        "tagid": "sidebar-skyscraper"
+      },
+      {
+        "id": "imp-footer",
+        "banner": {
+          "w": 728,
+          "h": 90,
+          "pos": 7
+        },
+        "bidfloor": 1.00,
+        "bidfloorcur": "USD",
+        "tagid": "footer-leaderboard"
+      },
+      {
+        "id": "imp-inline",
+        "banner": {
+          "w": 300,
+          "h": 250,
+          "pos": 5
+        },
+        "bidfloor": 1.75,
+        "bidfloorcur": "USD",
+        "tagid": "inline-mrec"
+      }
+    ],
+    "site": {
+      "id": "site-news",
+      "name": "Daily News Portal",
+      "domain": "news.example.com",
+      "cat": ["IAB12", "IAB12-1"],
+      "page": "https://news.example.com/2024/11/breaking-news-article",
+      "ref": "https://www.google.com/",
+      "publisher": {
+        "id": "pub-news-001",
+        "name": "Example News Media",
+        "domain": "example.com"
+      },
+      "content": {
+        "id": "article-98765",
+        "title": "Breaking News: Major Event Unfolds",
+        "cat": ["IAB12-1"],
+        "keywords": "breaking,news,events,current affairs"
+      }
+    },
+    "user": {
+      "id": "user-news-reader",
+      "buyeruid": "buyer-user-12345",
+      "yob": 1988,
+      "gender": "F",
+      "data": [
+        {
+          "id": "news-dmp",
+          "name": "News Reader DMP",
+          "segment": [
+            {"id": "seg-news-daily", "name": "Daily News Reader"},
+            {"id": "seg-politics", "name": "Politics Interest"},
+            {"id": "seg-business", "name": "Business Interest"}
+          ]
+        }
+      ],
+      "geo": {
+        "country": "USA",
+        "region": "TX",
+        "city": "Austin"
+      }
+    },
+    "device": {
+      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
+      "devicetype": 2,
+      "ip": "203.0.113.50",
+      "language": "en",
+      "js": 1,
+      "geo": {
+        "country": "USA",
+        "region": "TX",
+        "metro": "635"
+      }
+    },
+    "regs": {
+      "coppa": 0,
+      "gdpr": 0,
+      "us_privacy": "1YNN"
+    },
+    "source": {
+      "fd": 1,
+      "tid": "transaction-abc-123"
+    },
+    "at": 1,
+    "tmax": 120,
+    "cur": ["USD"],
+    "bcat": ["IAB25", "IAB26"],
+    "badv": ["competitor1.com", "competitor2.com"]
+  }
+}
