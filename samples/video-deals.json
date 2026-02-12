@@ -1,0 +1,90 @@
+{
+  "id": "sample-video-001",
+  "tmax": 150,
+  "lifecycle": "LIFECYCLE_PUBLISHER_BID_REQUEST",
+  "originator": {
+    "type": "TYPE_EXCHANGE",
+    "id": "exchange-video-001"
+  },
+  "applicable_intents": ["ACTIVATE_SEGMENTS", "ACTIVATE_DEALS", "ADJUST_DEAL_FLOOR"],
+  "bid_request": {
+    "id": "auction-456",
+    "imp": [
+      {
+        "id": "imp-1",
+        "video": {
+          "mimes": ["video/mp4", "video/webm"],
+          "minduration": 15,
+          "maxduration": 30,
+          "w": 640,
+          "h": 480,
+          "protocols": [2, 3, 5, 6],
+          "linearity": 1,
+          "playbackmethod": [1, 2]
+        },
+        "bidfloor": 8.00,
+        "bidfloorcur": "USD",
+        "pmp": {
+          "private_auction": true,
+          "deals": [
+            {
+              "id": "deal-premium-video",
+              "bidfloor": 10.00,
+              "bidfloorcur": "USD",
+              "at": 1
+            },
+            {
+              "id": "deal-standard-video",
+              "bidfloor": 6.00,
+              "bidfloorcur": "USD",
+              "at": 2
+            }
+          ]
+        }
+      }
+    ],
+    "site": {
+      "id": "site-789",
+      "name": "Example Streaming",
+      "domain": "streaming.example.com",
+      "cat": ["IAB1-6"],
+      "page": "https://streaming.example.com/watch/12345",
+      "content": {
+        "id": "content-12345",
+        "title": "Example Video Content",
+        "cat": ["IAB1-6"],
+        "livestream": false,
+        "len": 3600
+      }
+    },
+    "user": {
+      "id": "user-456",
+      "yob": 1985,
+      "gender": "F",
+      "data": [
+        {
+          "id": "dmp-video",
+          "name": "Video DMP",
+          "segment": [
+            {"id": "seg-premium-viewer", "name": "Premium Content Viewer"},
+            {"id": "seg-cord-cutter", "name": "Cord Cutter"}
+          ]
+        }
+      ]
+    },
+    "device": {
+      "ua": "Mozilla/5.0 (Smart TV; Linux; Tizen 6.0) AppleWebKit/537.36",
+      "devicetype": 3,
+      "ip": "192.168.1.100",
+      "geo": {
+        "country": "USA",
+        "region": "NY",
+        "city": "New York"
+      }
+    },
+    "regs": {
+      "coppa": false,
+      "gdpr": false
+    }
+  }
+}
