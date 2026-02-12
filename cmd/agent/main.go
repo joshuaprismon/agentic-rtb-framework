@@ -33,6 +33,7 @@ import (
 	"time"
 
 	"github.com/iabtechlab/agentic-rtb-framework/internal/agent"
+	"github.com/iabtechlab/agentic-rtb-framework/internal/federation"
 	"github.com/iabtechlab/agentic-rtb-framework/internal/handlers"
 	"github.com/iabtechlab/agentic-rtb-framework/internal/health"
 	"github.com/iabtechlab/agentic-rtb-framework/internal/mcp"
@@ -65,6 +66,9 @@ var (
 	mcpPort    = flag.Int("mcp-port", 50052, "MCP port")
 	webPort    = flag.Int("web-port", 8081, "Web interface port")
 	healthPort = flag.Int("health-port", 8080, "Health check HTTP port")
+
+	// Federation configuration
+	federationConfig = flag.String("federation-config", "", "Path to federation configuration file (YAML/JSON)")
 
 	// Version flag
 	showVersion = flag.Bool("version", false, "Show version information")
@@ -124,11 +128,29 @@ func main() {
 		}()
 	}
 
+	// Initialize federation manager if configured
+	var federationManager *federation.Manager
+	if *federationConfig != "" {
+		fm, err := federation.NewManagerFromFile(*federationConfig)
+		if err != nil {
+			log.Printf("Warning: Failed to initialize federation manager: %v", err)
+		} else {
+			federationManager = fm
+			log.Printf("Federation manager initialized from %s", *federationConfig)
+		}
+	}
+
 	// When both Web and MCP are enabled, serve them on the same port (web port)
 	// This allows an external load balancer to route to a single endpoint
 	if *enableWeb && *enableMCP {
 		// Create MCP agent that wraps the gRPC agent (single implementation)
 		mcpAgent = mcp.NewAgent(artfAgent, *listenAddr, *webPort)
+
+		// Attach federation manager if configured
+		if federationManager != nil {
+			mcpAgent.SetFederationManager(federationManager)
+			log.Printf("Federation manager attached to MCP interface")
+		}
 
 		// MCP endpoint is relative when served on same port
 		mcpEndpoint := buildMCPEndpoint()
@@ -163,6 +185,13 @@ func main() {
 		if *enableMCP {
 			// MCP agent wraps the gRPC agent (single implementation)
 			mcpAgent = mcp.NewAgent(artfAgent, *listenAddr, *mcpPort)
+
+			// Attach federation manager if configured
+			if federationManager != nil {
+				mcpAgent.SetFederationManager(federationManager)
+				log.Printf("Federation manager attached to MCP interface")
+			}
+
 			mcpListenAddr := fmt.Sprintf("%s:%d", *listenAddr, *mcpPort)
 
 			go func() {
@@ -263,6 +292,14 @@ func main() {
 			log.Printf("Web interface shutdown error: %v", err)
 		} else {
 			log.Printf("Web interface stopped")
+		}
+	}
+
+	if federationManager != nil {
+		if err := federationManager.Close(); err != nil {
+			log.Printf("Federation manager shutdown error: %v", err)
+		} else {
+			log.Printf("Federation manager stopped")
 		}
 	}
 
