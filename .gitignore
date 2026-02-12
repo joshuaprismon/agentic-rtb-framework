@@ -5,6 +5,7 @@ artf-agent
 *.dll
 *.so
 *.dylib
+target/
 
 # Test binary, built with `go test -c`
 *.test
@@ -22,8 +23,6 @@ coverage.html
 *.swp
 *.swo
 *~
-
-# OS
 .DS_Store
 Thumbs.db
 
