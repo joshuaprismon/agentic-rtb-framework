@@ -13,7 +13,7 @@ mod proto;
 mod service;
 
 use crate::config::{Config, API_VERSION, MODEL_VERSION};
-use crate::proto::com::iabtechlab::bidstream::mutation::v1::rtb_extension_point_server::RtbExtensionPointServer;
+use crate::proto::com::iabtechlab::bidstream::mutation::services::v1::rtb_extension_point_server::RtbExtensionPointServer;
 use crate::service::{handle_rest, RtbExtensionPointService};
 
 #[tokio::main]

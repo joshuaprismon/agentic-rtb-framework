@@ -9,8 +9,8 @@ use crate::proto::com::iabtechlab::bidstream::mutation::v1::{
 /// Build response metadata from configured versions.
 pub fn build_metadata() -> Metadata {
     Metadata {
-        api_version: Some(API_VERSION.to_string()),
-        model_version: Some(MODEL_VERSION.to_string()),
+        api_version: API_VERSION.to_string(),
+        model_version: MODEL_VERSION.to_string(),
     }
 }
 
@@ -40,7 +40,7 @@ pub fn bid_shade(path: &str, price: f64) -> Mutation {
         intent: Intent::BidShade.into(),
         op: Operation::Replace.into(),
         path: path.to_string(),
-        value: Some(Value::AdjustBid(AdjustBidPayload { price: Some(price) })),
+        value: Some(Value::AdjustBid(AdjustBidPayload { price: price })),
     }
 }
 

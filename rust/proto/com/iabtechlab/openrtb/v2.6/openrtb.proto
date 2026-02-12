@@ -1,7 +1,8 @@
 syntax = "proto2";
 
 option java_outer_classname = "OpenRtb";
-package com.iabtechlab.openrtb.v2_6;
+package com.iabtechlab.openrtb.v2;
+option go_package = "github.com/iabtechlab/agentic-rtb-framework/pkg/pb/openrtb";
 
 // Copyright 2020 IAB Tech Lab
 //
