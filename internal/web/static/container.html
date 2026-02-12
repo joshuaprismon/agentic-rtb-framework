@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Container Guide - ARTF Agent | IAB Tech Lab</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --iab-red: #dd3333;
+            --iab-red-dark: #c42d2d;
+            --iab-black: #000000;
+            --iab-charcoal: #252525;
+            --iab-dark-gray: #3f3f3f;
+            --iab-gray: #666666;
+            --iab-light-gray: #eeeeee;
+            --iab-bg-gray: #f4f4f4;
+            --iab-white: #ffffff;
+            --success: #28a745;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-size: 14px;
+            color: var(--iab-dark-gray);
+            background: var(--iab-bg-gray);
+            line-height: 1.6;
+        }
+
+        .header {
+            background: var(--iab-black);
+            color: var(--iab-white);
+        }
+
+        .header-top {
+            background: var(--iab-charcoal);
+            padding: 8px 0;
+            font-size: 12px;
+        }
+
+        .header-top .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-top a {
+            color: var(--iab-white);
+            text-decoration: none;
+            opacity: 0.8;
+        }
+
+        .header-top a:hover {
+            opacity: 1;
+            color: var(--iab-red);
+        }
+
+        .header-main {
+            padding: 20px 0;
+        }
+
+        .header-main .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            text-decoration: none;
+            color: var(--iab-white);
+        }
+
+        .logo-icon {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .logo-icon .dot {
+            width: 12px;
+            height: 12px;
+            background: var(--iab-red);
+            border-radius: 50%;
+        }
+
+        .logo-icon .dot.large {
+            width: 20px;
+            height: 20px;
+        }
+
+        .logo-text {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .logo-text span {
+            color: var(--iab-red);
+        }
+
+        .logo-subtitle {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.7;
+            margin-top: 2px;
+        }
+
+        .header-nav {
+            display: flex;
+            gap: 24px;
+            align-items: center;
+        }
+
+        .header-nav a {
+            color: var(--iab-white);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+
+        .header-nav a:hover, .header-nav a.active {
+            color: var(--iab-red);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .page-title {
+            background: linear-gradient(135deg, var(--iab-charcoal) 0%, var(--iab-black) 100%);
+            color: var(--iab-white);
+            padding: 40px 0;
+            border-bottom: 4px solid var(--iab-red);
+        }
+
+        .page-title h1 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .page-title p {
+            font-size: 16px;
+            opacity: 0.8;
+        }
+
+        .page-title .badge {
+            display: inline-block;
+            background: var(--iab-red);
+            color: var(--iab-white);
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        .main-content {
+            padding: 32px 0;
+        }
+
+        .section {
+            background: var(--iab-white);
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+            margin-bottom: 24px;
+            overflow: hidden;
+        }
+
+        .section-header {
+            background: var(--iab-charcoal);
+            color: var(--iab-white);
+            padding: 16px 20px;
+            font-weight: 600;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-header::before {
+            content: '';
+            width: 4px;
+            height: 20px;
+            background: var(--iab-red);
+            border-radius: 2px;
+        }
+
+        .section-body {
+            padding: 24px;
+        }
+
+        h3 {
+            color: var(--iab-charcoal);
+            font-size: 18px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        h3::before {
+            content: '';
+            width: 4px;
+            height: 18px;
+            background: var(--iab-red);
+            border-radius: 2px;
+        }
+
+        p {
+            margin-bottom: 16px;
+            color: var(--iab-gray);
+        }
+
+        .code-block {
+            background: var(--iab-charcoal);
+            border-radius: 4px;
+            padding: 16px;
+            margin: 16px 0;
+            overflow-x: auto;
+        }
+
+        .code-block pre {
+            color: #e8e8e8;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 13px;
+            white-space: pre;
+            margin: 0;
+        }
+
+        .code-block .comment {
+            color: #6a9955;
+        }
+
+        .code-block .keyword {
+            color: #569cd6;
+        }
+
+        .code-block .string {
+            color: #ce9178;
+        }
+
+        .code-block .command {
+            color: #dcdcaa;
+        }
+
+        code {
+            background: var(--iab-charcoal);
+            color: #e8e8e8;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 12px;
+        }
+
+        .step-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .step-list li {
+            display: flex;
+            margin-bottom: 20px;
+            align-items: flex-start;
+        }
+
+        .step-number {
+            width: 32px;
+            height: 32px;
+            background: var(--iab-red);
+            color: var(--iab-white);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 14px;
+            flex-shrink: 0;
+            margin-right: 16px;
+        }
+
+        .step-content h4 {
+            color: var(--iab-charcoal);
+            margin-bottom: 6px;
+        }
+
+        .step-content p {
+            margin-bottom: 8px;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        @media (max-width: 900px) {
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .info-box {
+            background: var(--iab-bg-gray);
+            border-left: 4px solid var(--iab-red);
+            padding: 16px;
+            border-radius: 0 4px 4px 0;
+            margin: 16px 0;
+        }
+
+        .info-box strong {
+            color: var(--iab-charcoal);
+        }
+
+        .manifest-json {
+            background: var(--iab-charcoal);
+            border-radius: 4px;
+            padding: 16px;
+            overflow-x: auto;
+        }
+
+        .manifest-json pre {
+            color: #e8e8e8;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 12px;
+            white-space: pre;
+            margin: 0;
+        }
+
+        .manifest-json .key {
+            color: #9cdcfe;
+        }
+
+        .manifest-json .string {
+            color: #ce9178;
+        }
+
+        .manifest-json .number {
+            color: #b5cea8;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+            font-size: 13px;
+        }
+
+        th, td {
+            padding: 10px 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--iab-light-gray);
+        }
+
+        th {
+            background: var(--iab-charcoal);
+            color: var(--iab-white);
+            font-weight: 600;
+        }
+
+        tr:nth-child(even) {
+            background: var(--iab-bg-gray);
+        }
+
+        .footer {
+            background: var(--iab-black);
+            color: var(--iab-white);
+            padding: 32px 0;
+            margin-top: 40px;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 24px;
+        }
+
+        .footer-links a {
+            color: var(--iab-white);
+            text-decoration: none;
+            font-size: 13px;
+            opacity: 0.8;
+        }
+
+        .footer-links a:hover {
+            opacity: 1;
+            color: var(--iab-red);
+        }
+
+        .footer-copyright {
+            font-size: 12px;
+            opacity: 0.6;
+        }
+
+        @media (max-width: 768px) {
+            .header-nav {
+                display: none;
+            }
+            .page-title h1 {
+                font-size: 24px;
+            }
+            .footer-content {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-top">
+            <div class="container">
+                <span>Agentic RTB Framework v1.0</span>
+                <a href="https://iabtechlab.com/standards/artf/" target="_blank">View Specification</a>
+            </div>
+        </div>
+        <div class="header-main">
+            <div class="container">
+                <a href="/" class="logo">
+                    <div class="logo-icon">
+                        <span class="dot large"></span>
+                        <span class="dot"></span>
+                        <span class="dot"></span>
+                    </div>
+                    <div>
+                        <div class="logo-text">iab<span>.TECH LAB</span></div>
+                        <div class="logo-subtitle">Agentic RTB Framework</div>
+                    </div>
+                </a>
+                <nav class="header-nav">
+                    <a href="/spec">Specification</a>
+                    <a href="/container" class="active">Container</a>
+                    <a href="/api/samples">API</a>
+                    <a href="https://github.com/IABTechLab/agentic-rtb-framework" target="_blank">GitHub</a>
+                    <a href="https://iabtechlab.com/" target="_blank">IAB Tech Lab</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <section class="page-title">
+        <div class="container">
+            <span class="badge">Container Guide</span>
+            <h1>Building ARTF Agent Containers</h1>
+            <p>Quick start guide for building, customizing, and deploying ARTF-compliant agent containers</p>
+        </div>
+    </section>
+
+    <main class="main-content">
+        <div class="container">
+            <!-- Quick Start -->
+            <div class="section">
+                <div class="section-header">Quick Start</div>
+                <div class="section-body">
+                    <p>Get the ARTF agent running in a container in under 2 minutes:</p>
+
+                    <ul class="step-list">
+                        <li>
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <h4>Clone the repository</h4>
+                                <div class="code-block">
+                                    <pre><span class="command">git clone</span> https://github.com/IABTechLab/agentic-rtb-framework.git
+<span class="command">cd</span> agentic-rtb-framework</pre>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <h4>Build the Docker image</h4>
+                                <div class="code-block">
+                                    <pre><span class="command">make</span> docker-build</pre>
+                                </div>
+                                <p>This builds the image with the proper <code>agent-manifest</code> label per the ARTF specification.</p>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <h4>Run the container</h4>
+                                <div class="code-block">
+                                    <pre><span class="comment"># Run with all interfaces enabled (gRPC, MCP, Web UI)</span>
+<span class="command">docker run</span> -p 50051:50051 -p 8081:8081 -p 8080:8080 \
+  artf-agent:latest --enable-grpc --enable-mcp --enable-web
+
+<span class="comment"># Run with gRPC only (minimal)</span>
+<span class="command">docker run</span> -p 50051:50051 -p 8080:8080 artf-agent:latest --enable-grpc</pre>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="step-number">4</div>
+                            <div class="step-content">
+                                <h4>Verify the container</h4>
+                                <div class="code-block">
+                                    <pre><span class="comment"># Check health endpoints</span>
+<span class="command">curl</span> http://localhost:8080/health/ready
+
+<span class="comment"># Access Web UI (if enabled)</span>
+<span class="command">open</span> http://localhost:8081</pre>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Agent Manifest -->
+            <div class="section">
+                <div class="section-header">Agent Manifest</div>
+                <div class="section-body">
+                    <p>
+                        The ARTF specification requires containers to include an <code>agent-manifest</code> label in the
+                        Docker image metadata. This manifest describes the agent's capabilities, resource requirements, and
+                        health configuration.
+                    </p>
+
+                    <h3>Manifest Structure</h3>
+                    <div class="manifest-json">
+                        <pre>{
+  <span class="key">"name"</span>: <span class="string">"artf-reference-agent"</span>,
+  <span class="key">"version"</span>: <span class="string">"0.10.0"</span>,
+  <span class="key">"vendor"</span>: <span class="string">"IAB Tech Lab"</span>,
+  <span class="key">"owner"</span>: <span class="string">"artf@iabtechlab.com"</span>,
+  <span class="key">"resources"</span>: {
+    <span class="key">"cpu"</span>: <span class="string">"500m"</span>,
+    <span class="key">"memory"</span>: <span class="string">"256Mi"</span>
+  },
+  <span class="key">"intents"</span>: [
+    <span class="string">"ACTIVATE_SEGMENTS"</span>,
+    <span class="string">"ACTIVATE_DEALS"</span>,
+    <span class="string">"SUPPRESS_DEALS"</span>,
+    <span class="string">"ADJUST_DEAL_FLOOR"</span>,
+    <span class="string">"ADJUST_DEAL_MARGIN"</span>,
+    <span class="string">"BID_SHADE"</span>,
+    <span class="string">"ADD_METRICS"</span>
+  ],
+  <span class="key">"health"</span>: {
+    <span class="key">"livenessProbe"</span>: {
+      <span class="key">"httpGet"</span>: { <span class="key">"path"</span>: <span class="string">"/health/live"</span>, <span class="key">"port"</span>: <span class="number">8080</span> }
+    },
+    <span class="key">"readinessProbe"</span>: {
+      <span class="key">"httpGet"</span>: { <span class="key">"path"</span>: <span class="string">"/health/ready"</span>, <span class="key">"port"</span>: <span class="number">8080</span> }
+    }
+  }
+}</pre>
+                    </div>
+
+                    <div class="info-box">
+                        <strong>Viewing the Manifest:</strong> You can inspect the manifest label on any ARTF container:
+                        <div class="code-block" style="margin-top: 8px; margin-bottom: 0;">
+                            <pre><span class="command">docker inspect</span> artf-agent:latest --format '{{index .Config.Labels "agent-manifest"}}' | <span class="command">jq</span> .</pre>
+                        </div>
+                    </div>
+
+                    <h3>Manifest Fields</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Field</th>
+                                <th>Type</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>name</code></td>
+                                <td>string</td>
+                                <td>Unique agent identifier</td>
+                            </tr>
+                            <tr>
+                                <td><code>version</code></td>
+                                <td>string</td>
+                                <td>Semantic version of the agent</td>
+                            </tr>
+                            <tr>
+                                <td><code>vendor</code></td>
+                                <td>string</td>
+                                <td>Organization that created the agent</td>
+                            </tr>
+                            <tr>
+                                <td><code>owner</code></td>
+                                <td>string</td>
+                                <td>Contact email for the agent owner</td>
+                            </tr>
+                            <tr>
+                                <td><code>resources</code></td>
+                                <td>object</td>
+                                <td>Kubernetes-style resource requests (cpu, memory)</td>
+                            </tr>
+                            <tr>
+                                <td><code>intents</code></td>
+                                <td>array</td>
+                                <td>List of mutation intents this agent supports</td>
+                            </tr>
+                            <tr>
+                                <td><code>dependencies</code></td>
+                                <td>object</td>
+                                <td>External services the agent requires (optional)</td>
+                            </tr>
+                            <tr>
+                                <td><code>health</code></td>
+                                <td>object</td>
+                                <td>Kubernetes-compatible health probe configuration</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Container Requirements -->
+            <div class="section">
+                <div class="section-header">ARTF Container Requirements</div>
+                <div class="section-body">
+                    <p>The ARTF specification mandates several security and operational requirements for containers:</p>
+
+                    <div class="grid-2">
+                        <div>
+                            <h3>Security Requirements</h3>
+                            <ul style="margin-left: 20px; color: var(--iab-gray);">
+                                <li><strong>Non-root user:</strong> Container must run as a non-root user (e.g., <code>nobody</code>)</li>
+                                <li><strong>Read-only filesystem:</strong> Use <code>--read-only</code> where possible</li>
+                                <li><strong>No network access:</strong> Containers should only communicate with the orchestrator</li>
+                                <li><strong>Least privilege:</strong> Drop unnecessary Linux capabilities</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h3>Operational Requirements</h3>
+                            <ul style="margin-left: 20px; color: var(--iab-gray);">
+                                <li><strong>Health probes:</strong> Implement <code>/health/live</code> and <code>/health/ready</code></li>
+                                <li><strong>Graceful shutdown:</strong> Handle SIGTERM for clean termination</li>
+                                <li><strong>Resource limits:</strong> Respect declared CPU/memory limits</li>
+                                <li><strong>OpenTelemetry:</strong> Support metrics and distributed tracing</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <h3>Port Configuration</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Port</th>
+                                <th>Service</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>50051</code></td>
+                                <td>gRPC</td>
+                                <td>RTBExtensionPoint gRPC service</td>
+                            </tr>
+                            <tr>
+                                <td><code>8081</code></td>
+                                <td>Web UI / MCP</td>
+                                <td>Web interface and MCP endpoint (at /mcp)</td>
+                            </tr>
+                            <tr>
+                                <td><code>8080</code></td>
+                                <td>Health</td>
+                                <td>Kubernetes health probes</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Customizing Your Agent -->
+            <div class="section">
+                <div class="section-header">Customizing Your Agent</div>
+                <div class="section-body">
+                    <p>
+                        The reference implementation provides a starting point for building your own ARTF-compliant agent.
+                        Here's how to customize the agent for your specific use case.
+                    </p>
+
+                    <h3>1. Fork and Clone</h3>
+                    <div class="code-block">
+                        <pre><span class="comment"># Fork the repository on GitHub, then clone your fork</span>
+<span class="command">git clone</span> https://github.com/YOUR-ORG/agentic-rtb-framework.git
+<span class="command">cd</span> agentic-rtb-framework</pre>
+                    </div>
+
+                    <h3>2. Implement Your Mutation Logic</h3>
+                    <p>
+                        The core mutation logic lives in <code>internal/handlers/</code>. Each intent has a dedicated handler
+                        that receives the bid request/response and returns mutations.
+                    </p>
+                    <div class="code-block">
+                        <pre><span class="comment">// internal/handlers/segments.go</span>
+<span class="keyword">func</span> (h *Handler) ActivateSegments(req *pb.RTBRequest) ([]*pb.Mutation, error) {
+    <span class="comment">// Your segment activation logic here</span>
+    <span class="comment">// Example: Look up user in your DMP, return segment IDs</span>
+
+    segments := h.lookupUserSegments(req.BidRequest.User.Id)
+
+    <span class="keyword">return</span> []*pb.Mutation{{
+        Intent: pb.Intent_ACTIVATE_SEGMENTS,
+        Op:     pb.Operation_OPERATION_ADD,
+        Path:   <span class="string">"/user/data/segment"</span>,
+        Ids:    &pb.IDsPayload{Id: segments},
+    }}, nil
+}</pre>
+                    </div>
+
+                    <h3>3. Configure External Dependencies</h3>
+                    <p>
+                        If your agent needs to call external services (databases, APIs), declare them in the manifest
+                        and configure the orchestrator to provide network access.
+                    </p>
+                    <div class="info-box">
+                        <strong>Security Note:</strong> ARTF agents typically run in a restricted network environment.
+                        External service access must be explicitly allowed by the host platform.
+                    </div>
+
+                    <h3>4. Update the Manifest</h3>
+                    <p>Customize the <code>agent-manifest</code> in your Dockerfile or Makefile build args:</p>
+                    <div class="code-block">
+                        <pre><span class="comment"># Set your agent's manifest values</span>
+<span class="command">make</span> docker-build \
+  AGENT_NAME=my-custom-agent \
+  AGENT_VERSION=1.0.0 \
+  AGENT_VENDOR="My Company" \
+  AGENT_OWNER=team@mycompany.com</pre>
+                    </div>
+
+                    <h3>5. Build and Test</h3>
+                    <div class="code-block">
+                        <pre><span class="comment"># Run tests</span>
+<span class="command">make</span> test
+
+<span class="comment"># Build the container</span>
+<span class="command">make</span> docker-build
+
+<span class="comment"># Run locally and test with the Web UI</span>
+<span class="command">docker run</span> -p 50051:50051 -p 8081:8081 -p 8080:8080 \
+  my-custom-agent:latest --enable-grpc --enable-mcp --enable-web</pre>
+                    </div>
+
+                    <h3>6. Deploy to Your Platform</h3>
+                    <p>Push the image to your container registry and configure the host platform to run your agent:</p>
+                    <div class="code-block">
+                        <pre><span class="comment"># Tag for your registry</span>
+<span class="command">docker tag</span> my-custom-agent:latest registry.example.com/my-custom-agent:1.0.0
+
+<span class="comment"># Push to registry</span>
+<span class="command">docker push</span> registry.example.com/my-custom-agent:1.0.0</pre>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Kubernetes Deployment -->
+            <div class="section">
+                <div class="section-header">Kubernetes Deployment</div>
+                <div class="section-body">
+                    <p>Example Kubernetes deployment manifest for running ARTF agents in production:</p>
+                    <div class="code-block">
+                        <pre><span class="keyword">apiVersion:</span> apps/v1
+<span class="keyword">kind:</span> Deployment
+<span class="keyword">metadata:</span>
+  <span class="keyword">name:</span> artf-agent
+  <span class="keyword">labels:</span>
+    <span class="keyword">app:</span> artf-agent
+<span class="keyword">spec:</span>
+  <span class="keyword">replicas:</span> <span class="number">3</span>
+  <span class="keyword">selector:</span>
+    <span class="keyword">matchLabels:</span>
+      <span class="keyword">app:</span> artf-agent
+  <span class="keyword">template:</span>
+    <span class="keyword">metadata:</span>
+      <span class="keyword">labels:</span>
+        <span class="keyword">app:</span> artf-agent
+    <span class="keyword">spec:</span>
+      <span class="keyword">securityContext:</span>
+        <span class="keyword">runAsNonRoot:</span> <span class="keyword">true</span>
+        <span class="keyword">runAsUser:</span> <span class="number">65534</span>
+      <span class="keyword">containers:</span>
+      - <span class="keyword">name:</span> agent
+        <span class="keyword">image:</span> artf-agent:latest
+        <span class="keyword">args:</span>
+        - <span class="string">"--enable-grpc"</span>
+        - <span class="string">"--enable-mcp"</span>
+        - <span class="string">"--enable-web"</span>
+        <span class="keyword">ports:</span>
+        - <span class="keyword">name:</span> grpc
+          <span class="keyword">containerPort:</span> <span class="number">50051</span>
+        - <span class="keyword">name:</span> web
+          <span class="keyword">containerPort:</span> <span class="number">8081</span>
+        - <span class="keyword">name:</span> health
+          <span class="keyword">containerPort:</span> <span class="number">8080</span>
+        <span class="keyword">resources:</span>
+          <span class="keyword">requests:</span>
+            <span class="keyword">cpu:</span> <span class="string">"500m"</span>
+            <span class="keyword">memory:</span> <span class="string">"256Mi"</span>
+          <span class="keyword">limits:</span>
+            <span class="keyword">cpu:</span> <span class="string">"1000m"</span>
+            <span class="keyword">memory:</span> <span class="string">"512Mi"</span>
+        <span class="keyword">livenessProbe:</span>
+          <span class="keyword">httpGet:</span>
+            <span class="keyword">path:</span> /health/live
+            <span class="keyword">port:</span> health
+          <span class="keyword">initialDelaySeconds:</span> <span class="number">5</span>
+        <span class="keyword">readinessProbe:</span>
+          <span class="keyword">httpGet:</span>
+            <span class="keyword">path:</span> /health/ready
+            <span class="keyword">port:</span> health
+          <span class="keyword">initialDelaySeconds:</span> <span class="number">5</span>
+        <span class="keyword">securityContext:</span>
+          <span class="keyword">readOnlyRootFilesystem:</span> <span class="keyword">true</span>
+          <span class="keyword">allowPrivilegeEscalation:</span> <span class="keyword">false</span></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-links">
+                    <a href="/">Tester</a>
+                    <a href="/spec">Specification</a>
+                    <a href="https://iabtechlab.com/standards/artf/" target="_blank">ARTF Spec</a>
+                    <a href="https://iabtechlab.com/" target="_blank">IAB Tech Lab</a>
+                </div>
+                <div class="footer-copyright">
+                    &copy; 2025 IAB Technology Laboratory. Licensed under Creative Commons Attribution 3.0.
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

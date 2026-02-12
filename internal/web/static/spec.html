@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARTF Specification | IAB Tech Lab</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --iab-red: #dd3333;
+            --iab-red-dark: #c42d2d;
+            --iab-black: #000000;
+            --iab-charcoal: #252525;
+            --iab-dark-gray: #3f3f3f;
+            --iab-gray: #666666;
+            --iab-light-gray: #eeeeee;
+            --iab-bg-gray: #f4f4f4;
+            --iab-white: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-size: 15px;
+            color: var(--iab-dark-gray);
+            background: var(--iab-white);
+            line-height: 1.7;
+        }
+
+        .header {
+            background: var(--iab-black);
+            color: var(--iab-white);
+            padding: 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-top {
+            background: var(--iab-charcoal);
+            padding: 8px 0;
+            font-size: 12px;
+        }
+
+        .header-top .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-top a {
+            color: var(--iab-white);
+            text-decoration: none;
+            opacity: 0.8;
+        }
+
+        .header-top a:hover {
+            opacity: 1;
+            color: var(--iab-red);
+        }
+
+        .header-main {
+            padding: 16px 0;
+        }
+
+        .header-main .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            text-decoration: none;
+            color: var(--iab-white);
+        }
+
+        .logo-icon {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .logo-icon .dot {
+            width: 12px;
+            height: 12px;
+            background: var(--iab-red);
+            border-radius: 50%;
+        }
+
+        .logo-icon .dot.large {
+            width: 20px;
+            height: 20px;
+        }
+
+        .logo-text {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-text span {
+            color: var(--iab-red);
+        }
+
+        .header-nav {
+            display: flex;
+            gap: 24px;
+            align-items: center;
+        }
+
+        .header-nav a {
+            color: var(--iab-white);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+
+        .header-nav a:hover {
+            color: var(--iab-red);
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        .container.wide {
+            max-width: 1200px;
+        }
+
+        .page-title {
+            background: linear-gradient(135deg, var(--iab-charcoal) 0%, var(--iab-black) 100%);
+            color: var(--iab-white);
+            padding: 48px 0;
+            border-bottom: 4px solid var(--iab-red);
+        }
+
+        .page-title h1 {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .page-title p {
+            font-size: 18px;
+            opacity: 0.8;
+        }
+
+        .page-title .badge {
+            display: inline-block;
+            background: var(--iab-red);
+            color: var(--iab-white);
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        .spec-content {
+            padding: 48px 0;
+        }
+
+        .spec-nav {
+            position: sticky;
+            top: 80px;
+            background: var(--iab-bg-gray);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 32px;
+        }
+
+        .spec-nav h3 {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--iab-gray);
+            margin-bottom: 12px;
+        }
+
+        .spec-nav ul {
+            list-style: none;
+        }
+
+        .spec-nav li {
+            margin-bottom: 8px;
+        }
+
+        .spec-nav a {
+            color: var(--iab-dark-gray);
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .spec-nav a:hover {
+            color: var(--iab-red);
+        }
+
+        h2 {
+            font-size: 28px;
+            color: var(--iab-charcoal);
+            margin-top: 48px;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--iab-light-gray);
+        }
+
+        h2:first-of-type {
+            margin-top: 0;
+        }
+
+        h3 {
+            font-size: 20px;
+            color: var(--iab-charcoal);
+            margin-top: 32px;
+            margin-bottom: 12px;
+        }
+
+        p {
+            margin-bottom: 16px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 24px 0;
+            font-size: 14px;
+        }
+
+        th, td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--iab-light-gray);
+        }
+
+        th {
+            background: var(--iab-charcoal);
+            color: var(--iab-white);
+            font-weight: 600;
+        }
+
+        tr:nth-child(even) {
+            background: var(--iab-bg-gray);
+        }
+
+        code {
+            background: var(--iab-charcoal);
+            color: #e8e8e8;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 13px;
+        }
+
+        pre {
+            background: var(--iab-charcoal);
+            color: #e8e8e8;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+            margin: 24px 0;
+        }
+
+        .intent-card {
+            background: var(--iab-bg-gray);
+            border-left: 4px solid var(--iab-red);
+            padding: 16px 20px;
+            margin-bottom: 16px;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .intent-card h4 {
+            font-family: 'Monaco', 'Menlo', monospace;
+            color: var(--iab-red);
+            margin-bottom: 8px;
+        }
+
+        .intent-card p {
+            margin: 0;
+            color: var(--iab-gray);
+        }
+
+        .flow-container {
+            background: var(--iab-charcoal);
+            border-radius: 8px;
+            padding: 24px;
+            margin: 24px 0;
+        }
+
+        .flow-step {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            color: var(--iab-white);
+        }
+
+        .flow-step:last-child {
+            margin-bottom: 0;
+        }
+
+        .flow-number {
+            width: 32px;
+            height: 32px;
+            background: var(--iab-red);
+            color: var(--iab-white);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            flex-shrink: 0;
+            margin-right: 16px;
+        }
+
+        .flow-content h4 {
+            margin-bottom: 4px;
+        }
+
+        .flow-content p {
+            font-size: 14px;
+            color: #aaa;
+            margin: 0;
+        }
+
+        .note {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 16px 20px;
+            border-radius: 0 8px 8px 0;
+            margin: 24px 0;
+        }
+
+        .note strong {
+            color: #856404;
+        }
+
+        .footer {
+            background: var(--iab-black);
+            color: var(--iab-white);
+            padding: 32px 0;
+            margin-top: 48px;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 24px;
+        }
+
+        .footer-links a {
+            color: var(--iab-white);
+            text-decoration: none;
+            font-size: 13px;
+            opacity: 0.8;
+        }
+
+        .footer-links a:hover {
+            opacity: 1;
+            color: var(--iab-red);
+        }
+
+        .footer-copyright {
+            font-size: 12px;
+            opacity: 0.6;
+        }
+
+        @media (max-width: 768px) {
+            .header-nav {
+                display: none;
+            }
+
+            .page-title h1 {
+                font-size: 28px;
+            }
+
+            table {
+                font-size: 12px;
+            }
+
+            th, td {
+                padding: 8px 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-top">
+            <div class="container wide">
+                <span>Agentic RTB Framework v1.0</span>
+                <a href="https://iabtechlab.com/standards/artf/" target="_blank">View Official Specification</a>
+            </div>
+        </div>
+        <div class="header-main">
+            <div class="container wide">
+                <a href="/" class="logo">
+                    <div class="logo-icon">
+                        <span class="dot large"></span>
+                        <span class="dot"></span>
+                        <span class="dot"></span>
+                    </div>
+                    <div>
+                        <div class="logo-text">iab<span>.TECH LAB</span></div>
+                    </div>
+                </a>
+                <nav class="header-nav">
+                    <a href="/">Tester</a>
+                    <a href="/spec" class="active">Specification</a>
+                    <a href="https://github.com/IABTechLab/agentic-rtb-framework" target="_blank">GitHub</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <section class="page-title">
+        <div class="container">
+            <span class="badge">Version 1.0</span>
+            <h1>Agentic RTB Framework</h1>
+            <p>A specification for using agent-driven containers in OpenRTB and Digital Advertising</p>
+        </div>
+    </section>
+
+    <main class="spec-content">
+        <div class="container">
+            <nav class="spec-nav">
+                <h3>Contents</h3>
+                <ul>
+                    <li><a href="#overview">Overview</a></li>
+                    <li><a href="#intents">Supported Intents</a></li>
+                    <li><a href="#operations">Mutation Operations</a></li>
+                    <li><a href="#flow">Processing Flow</a></li>
+                    <li><a href="#lifecycle">Lifecycle Stages</a></li>
+                    <li><a href="#api">API Reference</a></li>
+                    <li><a href="#manifest">Agent Manifest</a></li>
+                </ul>
+            </nav>
+
+            <h2 id="overview">Overview</h2>
+            <p>
+                The Agentic RTB Framework defines a foundation for implementing agent services which operate within
+                a host platform's infrastructure. Agents participate in OpenRTB bidstream processing by proposing
+                <strong>mutations</strong> to bid requests and responses through a standardized protocol.
+            </p>
+            <p>
+                Key principles:
+            </p>
+            <ul style="margin-left: 24px; margin-bottom: 16px;">
+                <li>Agents must participate in the core bidstream in real-time</li>
+                <li>Agents must accomplish specific goals through declared <strong>intents</strong></li>
+                <li>Agents must be composable and deployable as OCI containers</li>
+                <li>Agents must be performant (sub-millisecond latency) and efficient</li>
+                <li>Agents must adhere to least-privilege and least-data principles</li>
+            </ul>
+
+            <h2 id="intents">Supported Intents</h2>
+            <p>
+                Each mutation declares an <strong>intent</strong> that describes why a change is being proposed.
+                This enables orchestrators to make informed decisions about accepting or rejecting mutations.
+            </p>
+
+            <div class="intent-card">
+                <h4>ACTIVATE_SEGMENTS</h4>
+                <p>Activate user segments by their external segment IDs for audience targeting and data enrichment.</p>
+            </div>
+
+            <div class="intent-card">
+                <h4>ACTIVATE_DEALS</h4>
+                <p>Activate private marketplace deals by their external deal IDs to enable preferred buying arrangements.</p>
+            </div>
+
+            <div class="intent-card">
+                <h4>SUPPRESS_DEALS</h4>
+                <p>Suppress specific deals from participating in the auction based on business rules or eligibility criteria.</p>
+            </div>
+
+            <div class="intent-card">
+                <h4>ADJUST_DEAL_FLOOR</h4>
+                <p>Dynamically adjust the bid floor price for a specific deal based on market conditions or optimization strategies.</p>
+            </div>
+
+            <div class="intent-card">
+                <h4>ADJUST_DEAL_MARGIN</h4>
+                <p>Modify the margin or fee structure associated with a deal, supporting both CPM and percentage-based adjustments.</p>
+            </div>
+
+            <div class="intent-card">
+                <h4>BID_SHADE</h4>
+                <p>Optimize bid prices using intelligent pricing strategies to maximize value while maintaining win rates.</p>
+            </div>
+
+            <div class="intent-card">
+                <h4>ADD_METRICS</h4>
+                <p>Add viewability, brand safety, fraud detection, or other measurement metrics to impressions.</p>
+            </div>
+
+            <h2 id="operations">Mutation Operations</h2>
+            <p>
+                Each mutation specifies an operation type that determines how the value should be applied to the target path.
+            </p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Operation</th>
+                        <th>Description</th>
+                        <th>Example Use Case</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>OPERATION_ADD</code></td>
+                        <td>Add new data to the target path</td>
+                        <td>Adding new segments to user.data</td>
+                    </tr>
+                    <tr>
+                        <td><code>OPERATION_REMOVE</code></td>
+                        <td>Remove existing data from the target path</td>
+                        <td>Suppressing a deal from the PMP</td>
+                    </tr>
+                    <tr>
+                        <td><code>OPERATION_REPLACE</code></td>
+                        <td>Replace existing data at the target path</td>
+                        <td>Adjusting a bid price or floor</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2 id="flow">Processing Flow</h2>
+            <p>
+                The ARTF framework operates at different stages of the auction lifecycle. Here is the typical flow:
+            </p>
+
+            <div class="flow-container">
+                <div class="flow-step">
+                    <div class="flow-number">1</div>
+                    <div class="flow-content">
+                        <h4>Bid Request Received</h4>
+                        <p>Host platform receives OpenRTB bid request from exchange or upstream partner</p>
+                    </div>
+                </div>
+                <div class="flow-step">
+                    <div class="flow-number">2</div>
+                    <div class="flow-content">
+                        <h4>Agent Invocation (gRPC or MCP)</h4>
+                        <p>Platform invokes ARTF agent via gRPC (protobuf) or MCP (JSON-RPC) with request data</p>
+                    </div>
+                </div>
+                <div class="flow-step">
+                    <div class="flow-number">3</div>
+                    <div class="flow-content">
+                        <h4>Analysis &amp; Decision</h4>
+                        <p>Agent analyzes user, impression, and context data to determine appropriate mutations</p>
+                    </div>
+                </div>
+                <div class="flow-step">
+                    <div class="flow-number">4</div>
+                    <div class="flow-content">
+                        <h4>Mutation Response</h4>
+                        <p>Agent returns list of proposed mutations with intent, operation, path, and value</p>
+                    </div>
+                </div>
+                <div class="flow-step">
+                    <div class="flow-number">5</div>
+                    <div class="flow-content">
+                        <h4>Platform Application</h4>
+                        <p>Host platform validates and selectively applies approved mutations to the bidstream</p>
+                    </div>
+                </div>
+            </div>
+
+            <h2 id="lifecycle">Lifecycle Stages</h2>
+            <p>
+                ARTF agents can be invoked at different points in the auction lifecycle. The <code>lifecycle</code>
+                parameter indicates when the agent is being called.
+            </p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Stage</th>
+                        <th>Description</th>
+                        <th>Available Data</th>
+                        <th>Common Intents</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>PRE_AUCTION</code></td>
+                        <td>Before bids are solicited</td>
+                        <td>Bid Request only</td>
+                        <td>ACTIVATE_SEGMENTS, ACTIVATE_DEALS, SUPPRESS_DEALS</td>
+                    </tr>
+                    <tr>
+                        <td><code>POST_BID</code></td>
+                        <td>After bids are received</td>
+                        <td>Bid Request + Bid Response</td>
+                        <td>BID_SHADE, ADJUST_DEAL_FLOOR, ADD_METRICS</td>
+                    </tr>
+                    <tr>
+                        <td><code>PRE_RENDER</code></td>
+                        <td>Before ad rendering</td>
+                        <td>Winning bid details</td>
+                        <td>ADD_METRICS</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2 id="api">API Reference</h2>
+
+            <h3>gRPC Service Definition</h3>
+<pre>
+service RTBExtensionPoint {
+  rpc GetMutations (RTBRequest) returns (RTBResponse);
+}
+</pre>
+
+            <h3>RTBRequest Message</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th>Type</th>
+                        <th>Required</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>lifecycle</code></td>
+                        <td>Lifecycle</td>
+                        <td>Yes</td>
+                        <td>Auction lifecycle stage</td>
+                    </tr>
+                    <tr>
+                        <td><code>id</code></td>
+                        <td>string</td>
+                        <td>Yes</td>
+                        <td>Unique request ID assigned by exchange</td>
+                    </tr>
+                    <tr>
+                        <td><code>tmax</code></td>
+                        <td>int32</td>
+                        <td>Yes</td>
+                        <td>Maximum response time in milliseconds</td>
+                    </tr>
+                    <tr>
+                        <td><code>bid_request</code></td>
+                        <td>BidRequest</td>
+                        <td>Yes</td>
+                        <td>OpenRTB v2.6 BidRequest object</td>
+                    </tr>
+                    <tr>
+                        <td><code>bid_response</code></td>
+                        <td>BidResponse</td>
+                        <td>No</td>
+                        <td>OpenRTB v2.6 BidResponse (for POST_BID stage)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Mutation Message</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>intent</code></td>
+                        <td>Intent</td>
+                        <td>Purpose of the mutation (ACTIVATE_SEGMENTS, BID_SHADE, etc.)</td>
+                    </tr>
+                    <tr>
+                        <td><code>op</code></td>
+                        <td>Operation</td>
+                        <td>Operation type (ADD, REMOVE, REPLACE)</td>
+                    </tr>
+                    <tr>
+                        <td><code>path</code></td>
+                        <td>string</td>
+                        <td>Semantic path to the target (e.g., /user/data/segment)</td>
+                    </tr>
+                    <tr>
+                        <td><code>value</code></td>
+                        <td>oneof</td>
+                        <td>Payload: IDsPayload, AdjustDealPayload, AdjustBidPayload, or AddMetricsPayload</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Example Response</h3>
+<pre>
+{
+  "id": "request-123",
+  "mutations": [
+    {
+      "intent": "ACTIVATE_SEGMENTS",
+      "op": "OPERATION_ADD",
+      "path": "/user/data/segment",
+      "ids": {
+        "id": ["18-35-age-segment", "soccer-watchers"]
+      }
+    }
+  ],
+  "metadata": {
+    "api_version": "1.0",
+    "model_version": "v2.1"
+  }
+}
+</pre>
+
+            <h2 id="manifest">Agent Manifest</h2>
+            <p>
+                Each agent container must include an <code>agent-manifest</code> label in its image metadata
+                that defines capabilities, resource requirements, and dependencies.
+            </p>
+
+<pre>
+{
+  "name": "segment-activation-agent",
+  "version": "1.0.0",
+  "vendor": "example-vendor",
+  "owner": "owner@example.com",
+  "resources": {
+    "cpu": "500m",
+    "memory": "256Mi"
+  },
+  "intents": ["ACTIVATE_SEGMENTS", "ACTIVATE_DEALS"],
+  "dependencies": {
+    "audienceService": {
+      "service": "audience-svc",
+      "port": 9010
+    }
+  },
+  "health": {
+    "livenessProbe": {
+      "httpGet": { "path": "/health/live", "port": 8080 }
+    },
+    "readinessProbe": {
+      "httpGet": { "path": "/health/ready", "port": 8080 }
+    }
+  }
+}
+</pre>
+
+            <div class="note">
+                <strong>Note:</strong> For the complete specification including all details, examples, and requirements,
+                please refer to the official <a href="https://iabtechlab.com/standards/artf/" target="_blank">ARTF Specification</a>
+                on the IAB Tech Lab website.
+            </div>
+
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container wide">
+            <div class="footer-content">
+                <div class="footer-links">
+                    <a href="/">Tester</a>
+                    <a href="https://iabtechlab.com/standards/artf/" target="_blank">ARTF Specification</a>
+                    <a href="https://iabtechlab.com/standards/openrtb/" target="_blank">OpenRTB</a>
+                    <a href="https://github.com/IABTechLab/agentic-rtb-framework" target="_blank">GitHub</a>
+                </div>
+                <div class="footer-copyright">
+                    &copy; 2025 IAB Technology Laboratory. Licensed under Creative Commons Attribution 3.0.
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
