@@ -29,6 +29,7 @@ import (
 	"time"
 
 	"github.com/iabtechlab/agentic-rtb-framework/internal/agent"
+	"github.com/iabtechlab/agentic-rtb-framework/internal/federation"
 	pb "github.com/iabtechlab/agentic-rtb-framework/pkg/pb/artf"
 	openrtb "github.com/iabtechlab/agentic-rtb-framework/pkg/pb/openrtb"
 	"github.com/mark3labs/mcp-go/mcp"
@@ -39,10 +40,21 @@ import (
 // Agent wraps the MCP server with ARTF-specific functionality.
 // It delegates all business logic to the underlying gRPC ARTFAgent.
 type Agent struct {
-	mcpServer  *server.MCPServer
-	grpcAgent  *agent.ARTFAgent
-	addr       string
-	port       int
+	mcpServer         *server.MCPServer
+	grpcAgent         *agent.ARTFAgent
+	addr              string
+	port              int
+	federationManager *federation.Manager
+}
+
+// SetFederationManager sets the federation manager for federated GRPC calls
+func (a *Agent) SetFederationManager(fm *federation.Manager) {
+	a.federationManager = fm
+}
+
+// GetFederationManager returns the federation manager
+func (a *Agent) GetFederationManager() *federation.Manager {
+	return a.federationManager
 }
 
 // NewAgent creates a new MCP agent instance that wraps the gRPC agent
@@ -101,10 +113,22 @@ func (a *Agent) registerTools() {
 				"Valid values: ACTIVATE_SEGMENTS, ACTIVATE_DEALS, SUPPRESS_DEALS, ADJUST_DEAL_FLOOR, "+
 				"ADJUST_DEAL_MARGIN, BID_SHADE, ADD_METRICS, ADD_CIDS"),
 		),
+		mcp.WithBoolean("federate",
+			mcp.Description("If true, also call configured federated GRPC endpoints and aggregate their mutations. Default: false."),
+		),
+		mcp.WithArray("federate_endpoints",
+			mcp.Description("List of specific endpoint names to call. If empty and federate=true, all applicable endpoints are called."),
+		),
 	)
 
-	// Register tool with handler
+	// Define federation tools
+	listFederatedEndpointsTool := mcp.NewTool("list_federated_endpoints",
+		mcp.WithDescription("List all configured federated GRPC endpoints, their acceptable intents, health status, and configuration. Returns empty list if federation is not configured."),
+	)
+
+	// Register tools with handlers
 	a.mcpServer.AddTool(extendRTBTool, a.handleExtendRTB)
+	a.mcpServer.AddTool(listFederatedEndpointsTool, a.handleListFederatedEndpoints)
 }
 
 // handleExtendRTB processes the extend_rtb tool call by delegating to the gRPC agent
@@ -195,6 +219,66 @@ func (a *Agent) handleExtendRTB(ctx context.Context, request mcp.CallToolRequest
 		return mcp.NewToolResultError(fmt.Sprintf("processing error: %v", err)), nil
 	}
 
+	// Check if federation is requested
+	shouldFederate := false
+	if fedVal, ok := args["federate"].(bool); ok {
+		shouldFederate = fedVal
+	}
+
+	// If federation is enabled, call federated endpoints and merge results
+	if shouldFederate && a.federationManager != nil {
+		// Extract specific endpoint names if provided
+		var endpointNames []string
+		if epRaw, ok := args["federate_endpoints"].([]interface{}); ok {
+			for _, ep := range epRaw {
+				if name, ok := ep.(string); ok {
+					endpointNames = append(endpointNames, name)
+				}
+			}
+		}
+
+		log.Printf("MCP: Federating request %s to remote endpoints (specific=%v)", id, endpointNames)
+
+		var fedResponse *federation.FederatedResponse
+		if len(endpointNames) > 0 {
+			// Call specific endpoints
+			fedResponse = &federation.FederatedResponse{ID: id}
+			for _, epName := range endpointNames {
+				resp, err := a.federationManager.CallEndpoint(ctx, epName, grpcRequest)
+				if err != nil {
+					log.Printf("MCP: Federation endpoint '%s' error: %v", epName, err)
+					fedResponse.EndpointResults = append(fedResponse.EndpointResults, federation.FederatedResult{
+						EndpointName: epName,
+						Success:      false,
+						Error:        err.Error(),
+					})
+				} else {
+					fedResponse.Mutations = append(fedResponse.Mutations, resp.GetMutations()...)
+					fedResponse.EndpointResults = append(fedResponse.EndpointResults, federation.FederatedResult{
+						EndpointName: epName,
+						Success:      true,
+						Mutations:    resp.GetMutations(),
+					})
+				}
+			}
+		} else {
+			// Call all applicable endpoints
+			fedResponse, err = a.federationManager.GetMutations(ctx, grpcRequest, applicableIntentStrs)
+			if err != nil {
+				log.Printf("MCP: Federation error: %v", err)
+			}
+		}
+
+		// Merge federated mutations with local mutations
+		if fedResponse != nil && len(fedResponse.Mutations) > 0 {
+			allMutations := grpcResponse.GetMutations()
+			allMutations = append(allMutations, fedResponse.Mutations...)
+			grpcResponse.Mutations = allMutations
+			log.Printf("MCP: Merged %d federated mutations with %d local mutations",
+				len(fedResponse.Mutations), len(grpcResponse.GetMutations())-len(fedResponse.Mutations))
+		}
+	}
+
 	// Convert protobuf response to JSON
 	jsonResponse, err := protoResponseToJSON(grpcResponse)
 	if err != nil {
@@ -205,6 +289,31 @@ func (a *Agent) handleExtendRTB(ctx context.Context, request mcp.CallToolRequest
 		id, time.Since(startTime), len(grpcResponse.GetMutations()))
 
 	return mcp.NewToolResultText(string(jsonResponse)), nil
+}
+
+// handleListFederatedEndpoints lists configured federation endpoints
+func (a *Agent) handleListFederatedEndpoints(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	if a.federationManager == nil {
+		result := map[string]interface{}{
+			"endpoints": []interface{}{},
+			"message":   "Federation is not configured. Use --federation-config flag to enable.",
+		}
+		responseJSON, _ := json.Marshal(result)
+		return mcp.NewToolResultText(string(responseJSON)), nil
+	}
+
+	endpoints := a.federationManager.ListEndpoints()
+	result := map[string]interface{}{
+		"endpoints": endpoints,
+		"count":     len(endpoints),
+	}
+
+	responseJSON, err := json.Marshal(result)
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("serialization error: %v", err)), nil
+	}
+
+	return mcp.NewToolResultText(string(responseJSON)), nil
 }
 
 // parseIntent converts a string to pb.Intent
